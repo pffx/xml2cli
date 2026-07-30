@@ -1,0 +1,19 @@
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+  <edit-config>
+    <target>
+      <candidate/>
+    </target>
+    <config>
+      <configure xmlns="urn:nokia.com:sros:ns:yang:sr:conf">
+        <service xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <vpls ns0:operation="delete">
+            <service-name>4093</service-name>
+            <service-id>4093</service-id>
+          </vpls>
+        </service>
+      </configure>
+    </config>
+  </edit-config>
+</rpc>
+
+<!-- 通过rpc删除VPLS不需要删除vpls下面的sap，也不需要disable vpls，可以直接删除vpls。 -->

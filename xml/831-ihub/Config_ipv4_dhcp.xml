@@ -1,0 +1,33 @@
+<rpc message-id="1" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+ <edit-config>
+   <target>
+     <candidate/>
+   </target>
+<config>
+ <configure xmlns="urn:nokia.com:sros:ns:yang:sr:conf">
+   <service>
+     <ies>
+      <service-name>2</service-name>
+      <admin-state>enable</admin-state>
+       <customer>1</customer>
+       <interface>
+        <interface-name>mgmt_ztp</interface-name>
+        <admin-state>enable</admin-state>
+         <oamsave>true</oamsave>
+         <sap>
+          <sap-id>1/5/1:4093</sap-id>
+          <admin-state>enable</admin-state>
+         </sap>
+          <ipv4>
+            <dhcp>
+            <admin-state>enable</admin-state>
+            </dhcp>
+             </ipv4>
+         <ipv6/>
+       </interface>
+     </ies>
+   </service>
+ </configure>
+</config>
+ </edit-config>
+</rpc>

@@ -1,0 +1,23 @@
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+  <edit-config>
+    <target>
+      <candidate/>
+    </target>
+    <config>
+      <configure xmlns="urn:nokia.com:sros:ns:yang:sr:conf">
+        <service xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <vpls>
+            <service-name>4093</service-name>
+            <service-id>4093</service-id>
+            <sap ns0:operation="delete">
+              <sap-id>lag-2:0</sap-id>
+              <sap-id>lag-1:4093</sap-id>
+            </sap>
+          </vpls>
+        </service>
+      </configure>
+    </config>
+  </edit-config>
+</rpc>
+
+<!-- 通过rpc删除不需要先disable，可以直接删除节点。 -->

@@ -1,0 +1,19 @@
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+  <edit-config>
+    <target>
+      <candidate/>
+    </target>
+    <config>
+      <configure xmlns="urn:nokia.com:sros:ns:yang:sr:conf">
+        <service xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <vpls>
+            <service-name>4000</service-name>
+            <sap ns0:operation="delete">
+              <sap-id>1/1/c1/2:4000</sap-id>
+            </sap>
+          </vpls>
+        </service>
+      </configure>
+    </config>
+  </edit-config>
+</rpc>

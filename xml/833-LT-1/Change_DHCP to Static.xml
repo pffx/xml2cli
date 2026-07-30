@@ -1,0 +1,73 @@
+<rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+    <edit-config>
+        <target>
+            <running/>
+        </target>
+        <config>
+            <onus xmlns="urn:bbf:params:xml:ns:yang:bbf-fiber-onu-emulated-mount">
+                <onu>
+                    <name>PON5/ONT5</name>
+                    <root>
+                        <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces-mounted">
+                            <interface xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="replace">
+                                <name>VOIP_IPHOST</name>
+                                <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type-mounted">ianaift:ipForward</type>
+                                <ipv4 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip-mounted">
+                                    <enabled>true</enabled>
+                                    <ip-address-acquisition-method xmlns="urn:ietf:params:xml:ns:yang:nokia-ip-aug-mounted">
+                                        <origin>static</origin>
+                                    </ip-address-acquisition-method>
+                                    <address>
+                                        <ip>50.60.50.80</ip>
+                                        <netmask>255.255.255.0</netmask>
+                                    </address>
+                                </ipv4>
+                                <ipif-lower-layer xmlns="urn:ietf:params:xml:ns:yang:nokia-ip-aug-mounted">
+                                    <sub-interface>UNI_VOIP/VSI_600</sub-interface>
+                                </ipif-lower-layer>
+                                <ip-diagnose-control xmlns="urn:ietf:params:xml:ns:yang:nokia-ip-aug-mounted">
+                                    <respond-to-pings>true</respond-to-pings>
+                                    <respond-to-traceroute-messages>true</respond-to-traceroute-messages>
+                                </ip-diagnose-control>
+                            </interface>
+                        </interfaces>
+                        <system xmlns="urn:ietf:params:xml:ns:yang:ietf-system-mounted">
+                            <dns-resolver>
+                                <server xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="merge">
+                                    <name>pridns</name>
+                                    <udp-and-tcp>
+                                        <address>0.0.0.0</address>
+                                    </udp-and-tcp>
+                                </server>
+                                <server xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="merge">
+                                    <name>backupdns</name>
+                                    <udp-and-tcp>
+                                        <address>0.0.0.0</address>
+                                    </udp-and-tcp>
+                                </server>
+                            </dns-resolver>
+                        </system>
+                        <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing-mounted">
+                            <control-plane-protocols>
+                                <control-plane-protocol xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:operation="merge">
+                                    <type>static</type>
+                                    <name>default-route</name>
+                                    <static-routes>
+                                        <ipv4 xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv4-unicast-routing-mounted">
+                                            <route xmlns:ns1="urn:ietf:params:xml:ns:netconf:base:1.0" ns1:operation="merge">
+                                                <destination-prefix>0.0.0.0/0</destination-prefix>
+                                                <next-hop>
+                                                    <next-hop-address>50.60.50.60</next-hop-address>
+                                                </next-hop>
+                                            </route>
+                                        </ipv4>
+                                    </static-routes>
+                                </control-plane-protocol>
+                            </control-plane-protocols>
+                        </routing>
+                    </root>
+                </onu>
+            </onus>
+        </config>
+    </edit-config>
+</rpc>

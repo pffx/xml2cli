@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xml2cli</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>xml2cli</h1>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-header">
+        <div class="mode-switch">
+          <label><input type="radio" name="mode" value="xml2cli" checked /> XML → CLI</label>
+          <label><input type="radio" name="mode" value="cli2xml" /> CLI → XML</label>
+        </div>
+        <div class="input-tabs">
+          <button type="button" class="tab active" data-tab="paste">粘贴</button>
+          <button type="button" class="tab" data-tab="upload">上传</button>
+        </div>
+      </div>
+
+      <div id="paste-panel">
+        <textarea id="input-text" placeholder="粘贴 XML 或 CLI 命令..."></textarea>
+      </div>
+
+      <div id="upload-panel" class="hidden">
+        <div class="drop-zone" id="drop-zone">
+          <p>拖拽文件到此处，或点击选择</p>
+          <input type="file" id="file-input" />
+        </div>
+      </div>
+
+      <button type="button" id="convert-btn" class="primary">转换</button>
+      <p id="error" class="error hidden"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>输出</h2>
+        <div class="actions">
+          <button type="button" id="copy-btn">复制</button>
+          <button type="button" id="download-btn">下载</button>
+        </div>
+      </div>
+      <textarea id="output-text" readonly placeholder="转换结果将显示在这里..."></textarea>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
