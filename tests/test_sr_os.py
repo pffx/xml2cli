@@ -75,3 +75,18 @@ def test_save_oam_xml_to_cli():
     cli_lines, errors = convert_xml_to_cli(content, "831-ihub")
     assert errors == []
     assert cli_lines == ["oam-save"]
+
+
+def test_config_ipv4_dhcp_xml_to_cli():
+    content = (XML_DIR / "Config_ipv4_dhcp.xml").read_text(encoding="utf-8")
+    cli_lines, errors = convert_xml_to_cli(content, "831-ihub")
+    assert errors == []
+    assert cli_lines == [
+        "configure service ies 2 admin-state enable",
+        "configure service ies 2 customer 1",
+        "configure service ies 2 interface mgmt_ztp admin-state enable",
+        "configure service ies 2 interface mgmt_ztp oamsave true",
+        "configure service ies 2 interface mgmt_ztp sap 1/5/1:4093 admin-state enable",
+        "configure service ies 2 interface mgmt_ztp ipv4 dhcp admin-state enable",
+    ]
+    assert not any("ipv6" in line for line in cli_lines)

@@ -415,9 +415,13 @@ def _traverse_element(
         if not child_elements(child):
             if child_name in profile.list_keys:
                 continue
-            cmd = path + [child_name, element_text(child)]
+            leaf_val = element_text(child)
             if child_op == "delete":
-                cmd.append("delete")
+                results.append(" ".join(path + [child_name, "delete"]))
+                continue
+            if not leaf_val:
+                continue
+            cmd = path + [child_name, leaf_val]
             results.append(" ".join(cmd))
         else:
             _traverse_element(child, path, profile, results, inherited_op=child_op)

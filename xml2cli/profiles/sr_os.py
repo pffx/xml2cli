@@ -23,6 +23,7 @@ CONTAINERS = {
     "ies",
     "interface",
     "ipv4",
+    "dhcp",
     "primary",
     "lag",
     "card",
