@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>xml2cli</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/style.css?v=9" />
 </head>
 <body>
   <header class="header">
@@ -19,8 +19,8 @@
           <label><input type="radio" name="mode" value="cli2xml" /> CLI → XML</label>
         </div>
         <div class="input-tabs">
-          <button type="button" class="tab active" data-tab="paste">粘贴</button>
-          <button type="button" class="tab" data-tab="upload">上传</button>
+          <button type="button" class="btn btn-primary tab active" data-tab="paste">粘贴</button>
+          <button type="button" class="btn btn-tab tab" data-tab="upload">上传</button>
         </div>
       </div>
 
@@ -35,7 +35,10 @@
         </div>
       </div>
 
-      <button type="button" id="convert-btn" class="primary">转换</button>
+      <div class="panel-actions">
+        <button type="button" id="convert-btn" class="btn btn-primary">转换</button>
+        <button type="button" id="clear-btn" class="btn btn-tab">清除</button>
+      </div>
       <p id="error" class="error hidden"></p>
     </section>
 
@@ -43,14 +46,14 @@
       <div class="panel-header">
         <h2>输出</h2>
         <div class="actions">
-          <button type="button" id="copy-btn">复制</button>
-          <button type="button" id="download-btn">下载</button>
+          <button type="button" id="copy-btn" class="btn btn-primary">复制</button>
+          <button type="button" id="download-btn" class="btn btn-tab">下载</button>
         </div>
       </div>
       <textarea id="output-text" readonly placeholder="转换结果将显示在这里..."></textarea>
     </section>
   </main>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=9"></script>
 </body>
 </html>
