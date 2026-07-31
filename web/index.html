@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>xml2cli</title>
-  <link rel="stylesheet" href="/static/style.css?v=14" />
+  <link rel="stylesheet" href="/static/style.css?v=15" />
 </head>
 <body>
   <header class="header">
@@ -78,7 +78,7 @@
         </label>
         <label class="option">
           <span class="option-label">端口</span>
-          <input type="number" id="device-port" class="text-input port-input" value="830" min="1" max="65535" />
+          <input type="number" id="device-port" class="text-input port-input" value="22" min="1" max="65535" />
         </label>
         <label class="option">
           <span class="option-label">用户名</span>
@@ -87,13 +87,6 @@
         <label class="option">
           <span class="option-label">密码</span>
           <input type="password" id="device-password" class="text-input password-input" autocomplete="current-password" />
-        </label>
-        <label class="option">
-          <span class="option-label">协议</span>
-          <select id="deploy-transport" class="select-input transport-input">
-            <option value="netconf">NETCONF</option>
-            <option value="cli">CLI</option>
-          </select>
         </label>
       </div>
 
@@ -112,6 +105,6 @@
     </section>
   </main>
 
-  <script src="/static/app.js?v=14"></script>
+  <script src="/static/app.js?v=15"></script>
 </body>
 </html>

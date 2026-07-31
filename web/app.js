@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const devicePort = document.getElementById("device-port");
   const deviceUser = document.getElementById("device-user");
   const devicePassword = document.getElementById("device-password");
-  const deployTransport = document.getElementById("deploy-transport");
   const deployBtn = document.getElementById("deploy-btn");
   const deployStatusEl = document.getElementById("deploy-status");
   const pastePanel = document.getElementById("paste-panel");
@@ -67,9 +66,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return currentMode === "xml2cli" ? "cli" : "xml";
   }
 
-  function updateDefaultPort() {
-    const transport = deployTransport.value;
-    devicePort.value = DEFAULT_PORTS[transport] || "830";
+  function getDeployTransport() {
+    return currentMode === "xml2cli" ? "cli" : "netconf";
+  }
+
+  function updateDeployPortForMode() {
+    devicePort.value = currentMode === "xml2cli" ? DEFAULT_PORTS.cli : DEFAULT_PORTS.netconf;
   }
 
   function setBoardInfo(board, yangTree) {
@@ -177,6 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[name="mode"]').forEach((radio) => {
     radio.addEventListener("change", () => {
       currentMode = getMode();
+      updateDeployPortForMode();
       inputText.placeholder =
         currentMode === "xml2cli"
           ? "粘贴 NETCONF XML..."
@@ -289,8 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   });
 
-  deployTransport.addEventListener("change", updateDefaultPort);
-
   deployBtn.addEventListener("click", async () => {
     clearDeployStatus();
     const content = outputText.value.trim();
@@ -316,16 +317,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const board = getSelectedBoard();
-    const transport = deployTransport.value;
+    const transport = getDeployTransport();
     const contentFormat = getOutputContentFormat();
-    if (transport === "netconf" && contentFormat === "cli" && !board) {
-      showDeployStatus("NETCONF 下发 CLI 时需要选择或识别板卡", false);
-      return;
-    }
-    if (transport === "cli" && contentFormat === "xml" && !board) {
-      showDeployStatus("CLI 下发 XML 时需要选择或识别板卡", false);
-      return;
-    }
 
     const body = {
       content,
@@ -367,4 +360,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   loadBoards();
+  updateDeployPortForMode();
 });
