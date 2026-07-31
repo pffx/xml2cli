@@ -23,9 +23,10 @@ _ROOT_MODULE_OVERRIDES: dict[str, str] = {
 
 
 class NtFamily(Family):
-    def __init__(self, board_id: str) -> None:
+    def __init__(self, board_id: str, yang_tree: str = "standard") -> None:
         self.board_id = board_id
-        self.schema = load_schema(board_id)
+        tree_mode = "all" if yang_tree == "all" else "standard"
+        self.schema = load_schema(board_id, mode=tree_mode)
 
     def cli_prefix(self) -> list[str]:
         return []

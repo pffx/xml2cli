@@ -1,0 +1,139 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">  
+  <hardware xmlns="urn:ietf:params:xml:ns:yang:ietf-hardware">    
+    <component>
+      <name>Slot</name>
+      <class xmlns:nokia-hwi="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-hardware-identities">nokia-hwi:slot-lt</class>
+      <parent>Chassis</parent>
+      <parent-rel-pos>##SLOT_ID##</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+      <name>Board</name>
+      <class xmlns:nokia-hwi="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-hardware-identities">nokia-hwi:lt</class>
+      <parent>Slot</parent>
+      <parent-rel-pos>1</parent-rel-pos>
+      <mfg-name>ALCL</mfg-name>
+      <model-name xmlns="urn:bbf:yang:bbf-hardware-extension">LWLT-C</model-name>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+      <name>C1</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>1</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>      
+    <component>
+    <name>C2</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>2</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>        
+    <component>
+    <name>C3</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>3</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>           
+    <component>
+    <name>C4</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>4</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>         
+    <component>
+    <name>C5</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>5</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>        
+    <component>
+    <name>C6</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>6</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>         
+    <component>
+    <name>C7</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>7</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>  
+    <component>
+    <name>C8</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>8</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component> 
+     <component>
+    <name>C9</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>9</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>C10</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>10</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>C11</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>11</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>C12</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>12</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+  <component>
+    <name>C13</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>13</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>C14</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>14</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>C15</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>15</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>C16</name>
+      <class xmlns:bbf-hwt="urn:bbf:yang:bbf-hardware-types">bbf-hwt:cage</class>
+      <parent>Board</parent>
+      <parent-rel-pos>16</parent-rel-pos>
+      <admin-state>unlocked</admin-state>
+    </component>
+    <component>
+    <name>BP_Logical_Port</name>
+     <class xmlns:nokia-hwi="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-hardware-identities">nokia-hwi:backplane-port</class>
+     <parent>Board</parent>
+     <parent-rel-pos>1</parent-rel-pos>
+     <admin-state>unlocked</admin-state>
+    </component>
+  </hardware>
+</config>

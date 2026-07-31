@@ -1,0 +1,85 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+
+  <aaa xmlns="http://tail-f.com/ns/aaa/1.1">
+    <authentication>
+      <users>
+        <user>
+          <name>admin</name>
+          <uid>0</uid>
+          <gid>0</gid>
+          <password>$6$khVPrY1q6Q9RzKaD$K9vhjvduazVoNh6HbnDmszaMawSt2F0VJG3hBlFLog1vmiVaUFJ6NJYnGfO7VD26iwp1PzbXnoC8egIBCO/aF.</password>
+          <ssh_keydir>/var/confd/homes/admin/.ssh</ssh_keydir>
+          <homedir>/isam/logs/syslog</homedir>
+        </user>
+        <user>
+          <name>cli_user</name>
+          <uid>8999</uid>
+          <gid>99</gid>
+          <password>$6$QL5iKe1MGmAjVlhN$NGBkkVaBPGjFdazToMnNLbi6e/zf6qqNeevy354gQb0CC.qaEr5HxY8Klo5TTMeWjXty0eOaTvD1tWimDyB8A1</password>
+          <ssh_keydir>/var/confd/homes/cli_user</ssh_keydir>
+          <homedir>/isam/logs/syslog</homedir>
+        </user>
+      </users>
+    </authentication>
+    <ios>
+      <level>
+        <nr>0</nr>
+        <prompt>\h> </prompt>
+      </level>
+      <level>
+        <nr>15</nr>
+        <prompt>\h# </prompt>
+      </level>
+      <privilege>
+        <mode>exec</mode>
+        <level>
+          <nr>0</nr>
+          <command>
+            <name>exit</name>
+          </command>
+          <command>
+            <name>action</name>
+          </command>
+          <command>
+            <name>help</name>
+          </command>
+          <command>
+            <name>autowizard</name>
+          </command>
+          <command>
+            <name>enable</name>
+          </command>
+          <command>
+            <name>startup</name>
+          </command>
+        </level>
+        <level>
+          <nr>15</nr>
+          <command>
+            <name>configure</name>
+          </command>
+        </level>
+      </privilege>
+    </ios>
+  </aaa>
+
+  <login-user xmlns="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-aaa-hidden">
+    <user>
+      <name>admin</name>
+      <password-expiry>0</password-expiry>
+      <password-expiry-notification>0</password-expiry-notification>
+      <password-history-policy>3</password-history-policy>
+      <disable>false</disable>
+      <new-password-at-login>true</new-password-at-login>
+    </user>
+    <user>
+      <name>cli_user</name>
+      <password-expiry>0</password-expiry>
+      <password-expiry-notification>0</password-expiry-notification>
+      <password-history-policy>3</password-history-policy>
+      <disable>false</disable>
+      <new-password-at-login>true</new-password-at-login>
+    </user>
+  </login-user>
+
+</config>

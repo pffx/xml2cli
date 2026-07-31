@@ -1,0 +1,19 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+    <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+        <!-- LI-USER-GROUP RULE LIST -->
+        <rule-list>
+            <name>li-user-rule-list</name>
+            <group>li-user-config-access-group</group>
+            <rule>
+                <name>deny-cli-access</name>
+                <context xmlns="http://tail-f.com/yang/acm">cli</context>
+                <action>deny</action>
+            </rule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-all-cli-cmd</name>
+                <context>cli</context>
+                <action>deny</action>
+            </cmdrule>
+        </rule-list>
+    </nacm>
+</config>

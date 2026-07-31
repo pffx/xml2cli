@@ -1,0 +1,32 @@
+<config>
+    <classifiers xmlns="urn:bbf:yang:bbf-qos-classifiers">
+      <classifier-entry>
+        <name>obcRateLimitClaForNNI</name>
+        <filter-operation>match-all-filter</filter-operation>
+        <match-criteria>
+          <match-all/>
+        </match-criteria>
+        <classifier-action-entry-cfg>
+          <action-type xmlns:bbf-qos-rc="urn:bbf:yang:bbf-qos-rate-control">bbf-qos-rc:rate-limit-frames</action-type>
+          <rate-limit-frames xmlns="urn:bbf:yang:bbf-qos-rate-control">
+            <rate>256</rate>
+            <burst-size>512</burst-size>
+          </rate-limit-frames>
+        </classifier-action-entry-cfg>
+      </classifier-entry>
+    </classifiers>
+    <policies xmlns="urn:bbf:yang:bbf-qos-policies">
+      <policy>
+        <name>obcRateLimitPolForNNI</name>
+        <classifiers>
+          <name>obcRateLimitClaForNNI</name>
+        </classifiers>
+      </policy>
+    </policies>
+    <cpu-load-control-cfg xmlns="urn:bbf:yang:nokia-ingress-cpu-packets-rate-limit">
+      <default-ingress-cpu-packets-rate-limit>
+        <interface-usage>subtended-node-port</interface-usage>
+        <rate-limit-policy-name>obcRateLimitPolForNNI</rate-limit-policy-name>
+      </default-ingress-cpu-packets-rate-limit>
+    </cpu-load-control-cfg>
+</config>

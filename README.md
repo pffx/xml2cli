@@ -23,7 +23,7 @@ pip install -e ".[dev]"
 ```bash
 PYTHONPATH=. python -m xml2cli build-schemas
 # single board: --board LWLT-C
-# full tree:     --yang-tree all
+# full tree:     --yang-tree all   # writes yang_schema/{family}/{board}.all.json
 ```
 
 ## CLI Usage

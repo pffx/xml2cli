@@ -16,7 +16,7 @@ def build_schemas(board_ids: list[str] | None = None, mode: TreeMode = "standard
     written: list[str] = []
     for board_id in targets:
         schema = build_board_schema(board_id, mode=mode)
-        path = save_schema(schema)
+        path = save_schema(schema, mode=mode)
         written.append(str(path))
     return written
 

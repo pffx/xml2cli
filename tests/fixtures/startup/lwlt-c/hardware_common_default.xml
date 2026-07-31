@@ -1,0 +1,12 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <hardware xmlns="urn:ietf:params:xml:ns:yang:ietf-hardware">
+    <!-- CHASSIS -->
+    <component>
+      <name>Chassis</name>
+      <class xmlns:ianahw="urn:ietf:params:xml:ns:yang:iana-hardware">ianahw:chassis</class>
+      <mfg-name>ALCL</mfg-name>
+      <model-name xmlns="urn:bbf:yang:bbf-hardware-extension">##CHASSIS##</model-name>
+      <admin-state>unlocked</admin-state>
+    </component>
+  </hardware>
+</config>

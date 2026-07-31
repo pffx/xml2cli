@@ -1,0 +1,87 @@
+<config>
+    <tm-profiles xmlns="urn:bbf:yang:bbf-qos-traffic-mngt">
+  <tc-id-2-queue-id-mapping-profile>
+    <name>DEFAULT_TC_TO_4Queues</name>
+    <mapping-entry>
+      <traffic-class-id>0</traffic-class-id>
+      <local-queue-id>0</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>1</traffic-class-id>
+      <local-queue-id>0</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>2</traffic-class-id>
+      <local-queue-id>1</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>3</traffic-class-id>
+      <local-queue-id>1</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>4</traffic-class-id>
+      <local-queue-id>2</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>5</traffic-class-id>
+      <local-queue-id>2</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>6</traffic-class-id>
+      <local-queue-id>3</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>7</traffic-class-id>
+      <local-queue-id>3</local-queue-id>
+    </mapping-entry>
+  </tc-id-2-queue-id-mapping-profile>
+  </tm-profiles>
+    
+      <tm-profiles xmlns="urn:bbf:yang:bbf-qos-traffic-mngt">
+  <tc-id-2-queue-id-mapping-profile>
+    <name>DEFAULT_TC_TO_8Queues</name>
+    <mapping-entry>
+      <traffic-class-id>0</traffic-class-id>
+      <local-queue-id>0</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>1</traffic-class-id>
+      <local-queue-id>1</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>2</traffic-class-id>
+      <local-queue-id>2</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>3</traffic-class-id>
+      <local-queue-id>3</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>4</traffic-class-id>
+      <local-queue-id>4</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>5</traffic-class-id>
+      <local-queue-id>5</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>6</traffic-class-id>
+      <local-queue-id>6</local-queue-id>
+    </mapping-entry>
+    <mapping-entry>
+      <traffic-class-id>7</traffic-class-id>
+      <local-queue-id>7</local-queue-id>
+    </mapping-entry>
+  </tc-id-2-queue-id-mapping-profile>
+  </tm-profiles>
+  
+    <tm-profiles xmlns="urn:bbf:yang:bbf-qos-traffic-mngt">
+  <bac-entry>
+    <name>DEFAULTQ</name>
+    <max-queue-size>1000000</max-queue-size>
+    <taildrop>
+      <max-threshold>80</max-threshold>
+    </taildrop>
+  </bac-entry>
+  </tm-profiles>
+</config>

@@ -1,0 +1,215 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+
+    <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+        <!-- ANY-GROUP RULE LIST -->
+        <rule-list>
+            <name>any-group</name>
+            <rule>
+                <name>permit-change-password</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/authentication/change-password</path>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-read-user-name</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/name</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-last-password-changed</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/login/last-password-changed</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-last-login</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/login/last-login</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-last-failed</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/login/last-failed</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-failed-login</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/login/failed-login</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-show-pubkey</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/users/user[name='$USER']/authentication/authorized-key/</path>
+                <access-operations>read</access-operations>
+               <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-display-password-policy</name>
+                <module-name>nokia-aaa</module-name>
+                <path>/system-security/password-policy/</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>permit-forward</name>
+                <module-name>nokia-aggregation</module-name>
+                <path>/devices</path>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+            </rule>
+            <rule>
+                <name>deny-all-others</name>
+                <path>/</path>
+                <action>deny</action>
+            </rule>
+
+            <rule>
+                <name>deny-lock</name>
+                <rpc-name>lock</rpc-name>
+                <context xmlns="http://tail-f.com/yang/acm">netconf</context>
+                <action>deny</action>
+            </rule>
+            <rule>
+               <name>deny-kill-session</name>
+               <rpc-name>kill-session</rpc-name>
+               <context xmlns="http://tail-f.com/yang/acm">netconf</context>
+               <action>deny</action>
+            </rule>
+            <rule>
+                <name>deny-partial-lock</name>
+                <module-name>ietf-netconf-partial-lock</module-name>
+                <rpc-name>partial-lock</rpc-name>
+                <context xmlns="http://tail-f.com/yang/acm">netconf</context>
+                <action>deny</action>
+            </rule>
+            <rule>
+                <name>deny-create-subscription</name>
+                <rpc-name>create-subscription</rpc-name>
+                <action>deny</action>
+                <context xmlns="http://tail-f.com/yang/acm">netconf</context>
+            </rule>
+
+        <!-- ANY-GROUP-CMDRULES RULE LIST -->
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-macros</name>
+                <context>cli</context>
+                <command>macro</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-file-show-syslog</name>
+                <context>cli</context>
+                <command>file</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-show-parser</name>
+                <context>cli</context>
+                <command>show parser</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-show-notification</name>
+                <context>cli</context>
+                <command>show notification</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-ssh</name>
+                <context>cli</context>
+                <command>ssh</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-config-exclusive</name>
+                <context>cli</context>
+                <command>config exclusive</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-logout-user</name>
+                <context>cli</context>
+                <command>logout user</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-logout-session</name>
+                <context>cli</context>
+                <command>logout session</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-nokia-debug-display</name>
+                <context>cli</context>
+                <command>nokia-debug</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-commit-save-running</name>
+                <context>cli</context>
+                <command>commit save-running</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-show-jobs</name>
+                <context>cli</context>
+                <command>show jobs</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-output-file</name>
+                <context>cli</context>
+                <command>output-file</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-script</name>
+                <context>cli</context>
+                <command>script</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-load</name>
+                <context>cli</context>
+                <command>load</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-packet-capture-display</name>
+                <context>cli</context>
+                <command>nokia-packet-capture</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-logs-cli</name>
+                <context>cli</context>
+                <command>logs</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>deny-ihub-cli</name>
+                <context>cli</context>
+                <command>ihub</command>
+                <action>deny</action>
+            </cmdrule>
+            <cmdrule xmlns="http://tail-f.com/yang/acm">
+                <name>permit-all-cmds</name>
+                <context>cli</context>
+                <action>permit</action>
+            </cmdrule>
+
+        </rule-list>
+        <cmd-read-default xmlns="http://tail-f.com/yang/acm">deny</cmd-read-default>
+    </nacm>
+
+</config>

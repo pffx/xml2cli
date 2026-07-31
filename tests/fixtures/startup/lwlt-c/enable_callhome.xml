@@ -1,0 +1,7 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <!-- Enables callhome -->
+  <netconf-server xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server">
+    <call-home>
+    </call-home>
+  </netconf-server>
+</config>

@@ -1,0 +1,19 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <system xmlns="urn:ietf:params:xml:ns:yang:ietf-system">
+    <ntp>
+      <enabled>true</enabled> 	  
+      <server>
+        <name>ntp_fixed_server</name>
+        <association-type>server</association-type>
+	<iburst>true</iburst>
+	<prefer>true</prefer>
+        <maxpoll xmlns="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-ietf-system-aug">poll-16sec</maxpoll>
+        <minpoll xmlns="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-ietf-system-aug">poll-16sec</minpoll>
+        <udp>
+          <address>169.254.1.253</address>
+          <port>123</port>
+        </udp>	  
+      </server>
+    </ntp>
+  </system>	 
+</config>

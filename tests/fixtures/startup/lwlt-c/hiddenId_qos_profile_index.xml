@@ -1,0 +1,108 @@
+<config>
+    
+ <tm-profiles xmlns="urn:bbf:yang:bbf-qos-traffic-mngt">
+  <tc-id-2-queue-id-mapping-profile>
+    <name>DEFAULT_TC_TO_4Queues</name>
+  </tc-id-2-queue-id-mapping-profile>
+  </tm-profiles>
+  
+ <tm-profiles xmlns="urn:bbf:yang:bbf-qos-traffic-mngt">
+  <tc-id-2-queue-id-mapping-profile>
+    <name>DEFAULT_TC_TO_8Queues</name>
+  </tc-id-2-queue-id-mapping-profile>
+  </tm-profiles>
+  
+ <tm-profiles xmlns="urn:bbf:yang:bbf-qos-traffic-mngt">
+  <bac-entry>
+    <name>DEFAULTQ</name>
+  </bac-entry>
+  </tm-profiles>
+
+    <classifiers xmlns="urn:bbf:yang:bbf-qos-classifiers">
+      <classifier-entry>
+        <name>obcRateLimitCla</name>
+      </classifier-entry>
+      <classifier-entry>
+        <name>innerDEI0</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerDEI1</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp0</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp1</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp2</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp3</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp4</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp5</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp6</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>innerp7</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerDEI0</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerDEI1</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp0</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp1</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp2</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp3</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp4</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp5</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp6</name>
+      </classifier-entry>
+          <classifier-entry>
+        <name>outerp7</name>
+      </classifier-entry>
+    </classifiers>
+    <policies xmlns="urn:bbf:yang:bbf-qos-policies">
+      <policy>
+        <name>obcRateLimitPol</name>
+      </policy>
+          <policy>
+        <name>copyInnerTagDei</name>
+      </policy>
+          <policy>
+        <name>copyInnerTagPbit</name>
+      </policy>
+          <policy>
+        <name>copyOuterTagDei</name>
+      </policy>
+          <policy>
+        <name>copyOuterTagPbit</name>
+      </policy>
+    </policies>
+    <qos-policy-profiles xmlns="urn:bbf:yang:bbf-qos-policies">
+      <policy-profile>
+        <name>defaultCopyPbitDeiToMetadata</name>
+      </policy-profile>
+    </qos-policy-profiles>  
+</config>

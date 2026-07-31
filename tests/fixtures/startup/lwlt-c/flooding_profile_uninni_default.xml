@@ -1,0 +1,31 @@
+<config>
+  <forwarding xmlns="urn:bbf:yang:bbf-l2-forwarding">
+      <flooding-policies-profiles>
+        <flooding-policies-profile>
+          <name>drop_all</name>
+          <flooding-policy>
+            <name>dn_drop</name>
+            <in-interface-usages>
+              <interface-usages>network-port</interface-usages>
+            </in-interface-usages>
+            <destination-address>
+              <any-frame/>
+            </destination-address>
+            <out-interface-usages>
+              <interface-usages>subtended-node-port</interface-usages>
+            </out-interface-usages>
+          </flooding-policy>
+          <flooding-policy>
+            <name>up_drop</name>
+            <in-interface-usages>
+              <interface-usages>user-port</interface-usages>
+            </in-interface-usages>
+            <destination-address>
+              <any-multicast-mac-address/>
+            </destination-address>
+            <discard/>
+          </flooding-policy>
+        </flooding-policies-profile>
+      </flooding-policies-profiles>
+  </forwarding>
+</config>

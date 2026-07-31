@@ -1,0 +1,18 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+    <interface>
+      <name>BP_Eth</name>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <enabled>true</enabled>
+      <port-layer-if xmlns="urn:bbf:yang:bbf-interface-port-reference">BP_Logical_Port</port-layer-if>
+      <interface-usage xmlns="urn:bbf:yang:bbf-interface-usage">
+        <interface-usage>network-port</interface-usage>
+      </interface-usage>
+      <ethernet xmlns="urn:ieee:params:xml:ns:yang:ethernet">
+        <auto-negotiation>
+          <status>enabled</status>
+        </auto-negotiation>
+      </ethernet>
+    </interface>
+  </interfaces>
+</config>

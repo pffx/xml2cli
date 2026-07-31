@@ -13,14 +13,15 @@ from xml2cli.yang.tree_parser import TreeMode
 SCHEMA_ROOT = PROJECT_ROOT / "yang_schema"
 
 
-def schema_path(board_id: str, family: str | None = None) -> Path:
+def schema_path(board_id: str, family: str | None = None, mode: TreeMode = "standard") -> Path:
     if family is None:
         family = get_board(board_id).family
-    return SCHEMA_ROOT / family / f"{board_id}.json"
+    suffix = ".all.json" if mode == "all" else ".json"
+    return SCHEMA_ROOT / family / f"{board_id}{suffix}"
 
 
-def save_schema(schema: BoardSchema, path: Path | None = None) -> Path:
-    target = path or schema_path(schema.board_id, schema.family)
+def save_schema(schema: BoardSchema, path: Path | None = None, mode: TreeMode = "standard") -> Path:
+    target = path or schema_path(schema.board_id, schema.family, mode=mode)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
         json.dumps(_schema_to_dict(schema), indent=2, sort_keys=True) + "\n",
@@ -31,8 +32,13 @@ def save_schema(schema: BoardSchema, path: Path | None = None) -> Path:
 
 def load_schema(board_id: str, mode: TreeMode = "standard") -> BoardSchema:
     board = get_board(board_id)
-    path = schema_path(board_id, board.family)
+    path = schema_path(board_id, board.family, mode=mode)
     if not path.is_file():
+        if mode == "all":
+            raise FileNotFoundError(
+                f"Full-tree schema file not found: {path}. "
+                "Run: python -m xml2cli build-schemas --yang-tree all"
+            )
         raise FileNotFoundError(f"Schema file not found: {path}")
     return _schema_from_dict(json.loads(path.read_text(encoding="utf-8")))
 

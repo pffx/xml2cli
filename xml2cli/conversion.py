@@ -54,14 +54,14 @@ def list_board_ids() -> list[str]:
     return [board.board_id for board in list_boards()]
 
 
-def get_family(board_id: str) -> Family:
+def get_family(board_id: str, yang_tree: YangTreeMode = "standard") -> Family:
     board = get_board(board_id)
     if board.family == FAMILY_IHUB:
         return IhubFamily()
     if board.family == FAMILY_NT:
-        return NtFamily(board_id)
+        return NtFamily(board_id, yang_tree=yang_tree)
     if board.family == FAMILY_LT:
-        return LtFamily(board_id)
+        return LtFamily(board_id, yang_tree=yang_tree)
     raise ValueError(f"Unsupported family for board {board_id}")
 
 
@@ -124,7 +124,7 @@ def convert_xml_to_cli(
     board_id: str,
     yang_tree: YangTreeMode = "standard",
 ) -> tuple[list[str], list[str]]:
-    family = get_family(board_id)
+    family = get_family(board_id, yang_tree=yang_tree)
     schema = load_board_schema(board_id, yang_tree=yang_tree)
     try:
         rpc = parse_rpc(xml_content)
@@ -168,7 +168,7 @@ def convert_cli_to_xml(
     board_id: str,
     yang_tree: YangTreeMode = "standard",
 ) -> tuple[str, list[str]]:
-    family = get_family(board_id)
+    family = get_family(board_id, yang_tree=yang_tree)
     schema = load_board_schema(board_id, yang_tree=yang_tree)
     lines = [line.strip() for line in cli_content.splitlines() if line.strip()]
     if not lines:

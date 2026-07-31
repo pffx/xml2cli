@@ -34,9 +34,10 @@ _SKIP_XMLNS: set[tuple[str, str]] = {("policy", "classifiers")}
 
 
 class LtFamily(Family):
-    def __init__(self, board_id: str) -> None:
+    def __init__(self, board_id: str, yang_tree: str = "standard") -> None:
         self.board_id = board_id
-        self.schema = load_schema(board_id)
+        tree_mode = "all" if yang_tree == "all" else "standard"
+        self.schema = load_schema(board_id, mode=tree_mode)
 
     def cli_prefix(self) -> list[str]:
         return []
@@ -245,9 +246,21 @@ class LtFamily(Family):
                     skip_names=set(child_schema.keys),
                 )
             elif child_schema.kind in STRUCTURE_KINDS:
-                self._emit_element(child, child_schema, [*prefix, name], lines)
+                if list(child):
+                    self._emit_element(child, child_schema, [*prefix, name], lines)
+                elif _is_dynamic_key_tag(name):
+                    lines.append(" ".join([*prefix, name]))
             elif (child.text or "").strip():
                 lines.append(" ".join([*prefix, name, (child.text or "").strip()]))
+            elif list(child):
+                self._emit_element(
+                    child,
+                    _passthrough_schema(name),
+                    [*prefix, name],
+                    lines,
+                )
+            elif _is_dynamic_key_tag(name):
+                lines.append(" ".join([*prefix, name]))
 
 
 def _resolve_child(schema_node: SchemaNode, token: str) -> SchemaNode | None:
@@ -306,3 +319,13 @@ def _find_child_by_local_name(parent: ET.Element, name: str) -> ET.Element | Non
         if local_name(child.tag) == name:
             return child
     return None
+
+
+def _is_dynamic_key_tag(name: str) -> bool:
+    if not name:
+        return False
+    if name.isdigit():
+        return True
+    if ":" in name:
+        return True
+    return name.startswith("cp_") or name.startswith("scg_") or name.startswith("cg_")

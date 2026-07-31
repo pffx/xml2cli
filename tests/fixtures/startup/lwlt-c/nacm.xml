@@ -1,0 +1,33 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+
+  <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+    <log-if-default-permit xmlns="http://tail-f.com/yang/acm"></log-if-default-permit>
+    <groups>
+      <group>
+          <name>techsupport-group</name>
+          <user-name>admin</user-name>
+      </group>
+      <group>
+          <name>admin-group</name>
+          <user-name>admin</user-name>
+      </group>
+      <group>
+          <name>admin-read-only-group</name>
+      </group>
+      <group>
+          <name>vcli-group</name>
+          <user-name>cli_user</user-name>
+      </group>
+      <group>
+          <name>netconf-only-group</name>
+      </group>
+      <group>
+          <name>cli-only-group</name>
+      </group>
+      <group>
+          <name>defaultGroup</name>
+      </group>
+    </groups>
+  </nacm>
+
+</config>

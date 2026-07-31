@@ -1,0 +1,12 @@
+<config>
+    <classifiers xmlns="urn:bbf:yang:bbf-qos-classifiers">
+      <classifier-entry>
+        <name>obcRateLimitClaForNNI</name>
+      </classifier-entry>
+    </classifiers>
+    <policies xmlns="urn:bbf:yang:bbf-qos-policies">
+      <policy>
+        <name>obcRateLimitPolForNNI</name>
+      </policy>
+    </policies>
+</config>

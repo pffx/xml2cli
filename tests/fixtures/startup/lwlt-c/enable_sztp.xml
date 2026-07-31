@@ -1,0 +1,5 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <sztp xmlns="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-sdan-sztp">
+    <enabled>true</enabled>
+  </sztp>
+</config>

@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <confdConfig xmlns="http://tail-f.com/ns/confd_dyncfg/1.0">
+    <ssh>
+      <algorithms>
+        <mac>hmac-sha2-256,hmac-sha2-512</mac>
+        <encryption>aes128-ctr,aes192-ctr,aes256-ctr</encryption>
+        <kex>diffie-hellman-group14-sha256,diffie-hellman-group-exchange-sha256</kex>
+        <serverHostKey>ssh-rsa,ssh-dss</serverHostKey>
+      </algorithms>
+      <idleConnectionTimeout>PT1S</idleConnectionTimeout>
+      <clientAliveInterval>PT300S</clientAliveInterval>
+      <clientAliveCountMax>3</clientAliveCountMax>
+      <parallelLogin>true</parallelLogin>
+      <rekeyLimit>
+        <bytes>0</bytes>
+        <minutes>0</minutes>
+      </rekeyLimit>
+    </ssh>
+
+    <parserLimits>
+      <maxDataLength>8192</maxDataLength>
+      <maxAttributeValueLength>4096</maxAttributeValueLength>
+    </parserLimits>
+
+    <aaa>
+      <authenticationCallback>
+        <enabled>true</enabled>
+      </authenticationCallback>
+      <defaultGroup>defaultGroup</defaultGroup>
+      <authOrder>externalAuthentication localAuthentication</authOrder>
+      <externalAuthentication>
+        <includeExtra>true</includeExtra>
+        <enabled>true</enabled>
+        <executable>/etc/confd/radius_external_auth_start.sh</executable>
+      </externalAuthentication>
+    </aaa>
+
+    <cli>
+      <style>c</style>
+      <tableLabel>true</tableLabel>
+      <promptEnumLimit>10</promptEnumLimit>
+      <showDefaults>true</showDefaults>
+      <ignoreLeadingWhitespace>true</ignoreLeadingWhitespace>
+      <ssh>
+        <enabled>true</enabled>
+        <ip>0.0.0.0</ip>
+        <port>2024</port>
+        <extraIpPorts>[0::0]:2024</extraIpPorts>
+      </ssh>
+      <restrictedFileAccess>true</restrictedFileAccess>
+      <allowTableCellWrap>false</allowTableCellWrap>
+      <suppressCommitMessages>
+        <context>system</context>
+      </suppressCommitMessages>
+      <reallocateOperTrans>true</reallocateOperTrans>
+      <topLevelCmdsInSubMode>true</topLevelCmdsInSubMode>
+    </cli>
+
+    <netconf>
+      <transport>
+        <ssh>
+          <enabled>true</enabled>
+          <ip>0.0.0.0</ip>
+          <port>830</port>
+          <extraIpPorts>[0::0]:830</extraIpPorts>
+          <rcvPktSize>4</rcvPktSize>
+          <ncChunkSize>16384</ncChunkSize>
+        </ssh>
+        <tcp>
+          <enabled>true</enabled>
+          <ip>0.0.0.0</ip>
+          <port>2023</port>
+          <extraIpPorts>[0::1]:2023</extraIpPorts>
+        </tcp>
+      </transport>
+      <extendedSessions>true</extendedSessions>
+      <writeTimeout>PT30M</writeTimeout>
+      <idleTimeout>PT24H</idleTimeout>
+    </netconf>
+
+    <sessionLimits>
+      <maxSessions>10</maxSessions>
+      <sessionLimit>
+        <context>cli</context>
+        <maxSessions>3</maxSessions>
+      </sessionLimit>
+      <sessionLimit>
+        <context>netconf</context>
+        <maxSessions>6</maxSessions>
+      </sessionLimit>
+
+      <maxConfigSessions>10</maxConfigSessions>
+      <configSessionLimit>
+        <context>cli</context>
+        <maxSessions>3</maxSessions>
+      </configSessionLimit>
+      <configSessionLimit>
+        <context>netconf</context>
+        <maxSessions>6</maxSessions>
+      </configSessionLimit>
+    </sessionLimits>
+
+    <encryptedStrings>
+      <externalKeys>
+        <command>/isam/scripts/get_keys.sh</command>
+      </externalKeys>
+    </encryptedStrings>
+
+    <logs>
+      <syslogConfig>
+        <!-- facility can be 'daemon', 'local0' ... 'local7' or an integer -->
+        <facility>daemon</facility>
+        <!-- if udp is not enabled, messages will be sent to local syslog -->
+        <udp>
+          <enabled>false</enabled>
+          <host>syslogsrv.example.com</host>
+          <port>514</port>
+        </udp>
+      </syslogConfig>
+
+      <confdLog>
+        <enabled>false</enabled>
+        <file>
+          <enabled>true</enabled>
+          <name>/var/confd/log/confd.log</name>
+        </file>
+        <syslog>
+          <enabled>false</enabled>
+        </syslog>
+      </confdLog>
+
+      <developerLog>
+        <enabled>true</enabled>
+        <file>
+          <enabled>true</enabled>
+          <name>/isam/logs/confd_internal/devel.log</name>
+        </file>
+        <syslog>
+          <enabled>false</enabled>
+        </syslog>
+      </developerLog>
+      <developerLogLevel>info</developerLogLevel>
+
+      <auditLog>
+        <enabled>true</enabled>
+        <file>
+          <enabled>true</enabled>
+          <name>/var/confd/log/audit.log</name>
+        </file>
+        <syslog>
+          <enabled>false</enabled>
+        </syslog>
+      </auditLog>
+
+      <auditLogCommit>false</auditLogCommit>
+
+      <netconfLog>
+        <enabled>true</enabled>
+        <file>
+          <enabled>true</enabled>
+          <name>/isam/logs/confd_internal/netconf.log</name>
+  	</file>
+	<logReplyStatus>true</logReplyStatus>
+	<syslog>
+          <enabled>false</enabled>
+        </syslog>
+      </netconfLog>
+
+      <webuiAccessLog>
+        <enabled>false</enabled>
+        <dir>/var/confd/log/confd</dir>
+      </webuiAccessLog>
+
+      <snmpLog>
+        <enabled>false</enabled>
+        <file>
+          <enabled>true</enabled>
+          <name>/var/confd/log/snmp.log</name>
+        </file>
+        <syslog>
+          <enabled>false</enabled>
+        </syslog>
+      </snmpLog>
+
+      <netconfTraceLog>
+        <enabled>false</enabled>
+        <filename>/var/confd/log/netconf.trace</filename>
+      </netconfTraceLog>
+
+      <errorLog>
+        <enabled>true</enabled>
+        <filename>/var/confd/log/confderr.log</filename>
+        <maxSize>S1M</maxSize>
+      </errorLog>
+    </logs>
+    <notifications>
+      <eventStreams>
+        <stream>
+          <name>NETCONF</name>
+          <description>RFC 5277 Default Notifications Stream</description>
+          <replaySupport>true</replaySupport>
+          <builtinReplayStore>
+            <enabled>true</enabled>
+            <dir>/run/confd/log</dir>
+            <maxSize>S1M</maxSize>
+            <maxFiles>10</maxFiles>
+          </builtinReplayStore>
+        </stream>
+      </eventStreams>
+    </notifications>
+  </confdConfig>
+</config>
