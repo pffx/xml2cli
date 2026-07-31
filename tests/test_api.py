@@ -5,12 +5,22 @@ from fastapi.testclient import TestClient
 from xml2cli.api import create_app
 
 
-def test_profiles_endpoint():
+def test_boards_endpoint():
+    client = TestClient(create_app())
+    response = client.get("/api/boards")
+    assert response.status_code == 200
+    data = response.json()
+    board_ids = {board["id"] for board in data["boards"]}
+    assert "LWLT-C" in board_ids
+    assert "IHUB-LMNT-A" in board_ids
+    assert "NT-LMNT-A" in board_ids
+
+
+def test_profiles_endpoint_alias():
     client = TestClient(create_app())
     response = client.get("/api/profiles")
     assert response.status_code == 200
-    data = response.json()
-    assert "831-ihub" in data["profiles"]
+    assert "boards" in response.json()
 
 
 def test_xml2cli_endpoint():
@@ -22,7 +32,7 @@ def test_xml2cli_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["cli"] == ["commit"]
-    assert data["profile"] == "831-ihub"
+    assert data["board"] == "IHUB-LMNT-A"
 
 
 def test_cli2xml_endpoint():
@@ -30,11 +40,12 @@ def test_cli2xml_endpoint():
     response = client.post(
         "/api/cli2xml",
         json={
-            "content": "configure service vpls 4093 sap 1/1/c1/1:0 admin-state enable",
+            "content": "configure card 1 admin-state enable",
+            "board": "IHUB-LMNT-A",
         },
     )
     assert response.status_code == 200
     data = response.json()
     assert "<rpc" in data["xml"]
     assert data["errors"] == []
-    assert data["profile"] == "831-ihub"
+    assert data["board"] == "IHUB-LMNT-A"

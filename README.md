@@ -1,14 +1,16 @@
 # xml2cli
 
-Bidirectional NETCONF XML ↔ CLI converter for Nokia device profiles.
+Bidirectional NETCONF XML ↔ CLI converter driven by official YANG tree models.
 
-## Profiles
+## Board families
 
-| Folder | Device type |
-|--------|-------------|
-| `831-ihub` | Nokia SR OS |
-| `832-nt` | IETF System (Fixed Networks) |
-| `833-LT-1` | BBF ONU |
+| Family | Boards | CLI style |
+|--------|--------|-----------|
+| **IHUB** | LANT-A, LMNT-A/B/C/D | `configure ...` |
+| **NT** | LANT-A, LBNT-A, LDNT-A, LMNT-A/B/C/D | `system ...`, `nokia-debug ...` |
+| **LT** | LLLT-A, LWLT-C, LGLT-D | LT roots + `onus onu <name> fromroot ...` |
+
+YANG models live in `yang_model/`. Compiled schemas in `yang_schema/` (build step below).
 
 ## Install
 
@@ -16,30 +18,38 @@ Bidirectional NETCONF XML ↔ CLI converter for Nokia device profiles.
 pip install -e ".[dev]"
 ```
 
+## Build schemas (required before conversion)
+
+```bash
+PYTHONPATH=. python -m xml2cli build-schemas
+# single board: --board LWLT-C
+# full tree:     --yang-tree all
+```
+
 ## CLI Usage
 
 ```bash
-# XML → CLI
-xml2cli xml2cli xml/831-ihub/Config_port.xml
+# XML → CLI (auto-detect board)
+xml2cli xml2cli input.xml
 
 # CLI → XML RPC
-xml2cli cli2xml "configure service vpls 4093 sap 1/1/c1/1:0 admin-state enable" --profile 831-ihub
+xml2cli cli2xml "classifiers classifier-entry eg0 ..." --profile LWLT-C
 
 # Start web UI
 xml2cli serve --host 0.0.0.0 --port 8888
 ```
 
-## Web UI
+Web UI supports board selection and pushing generated CLI/XML to devices via NETCONF (port 830) or SSH CLI (port 22).
 
-Open `http://localhost:8080/` after starting the server. Supports:
-
-- Paste XML or CLI text
-- Upload `.xml` or `.txt` files
-- Profile selection
-- Copy / download results
+Legacy profile names still map: `831-ihub` → `IHUB-LMNT-A`, `832-nt` → `NT-LMNT-A`, `833-LT-1` → `LWLT-C`.
 
 ## Tests
 
 ```bash
-pytest -v
+PYTHONPATH=. pytest -v
 ```
+
+## Design docs
+
+- Spec: `docs/superpowers/specs/2026-07-31-yang-driven-xml2cli-design.md`
+- Plan: `docs/superpowers/plans/2026-07-31-yang-driven-xml2cli.md`

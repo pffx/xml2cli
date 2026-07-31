@@ -26,19 +26,22 @@ body {
 .layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.75rem 1rem;
   padding: 1rem;
   min-height: calc(100vh - 64px);
 }
 
 .panel {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 4;
+  gap: 0.75rem;
   background: #fff;
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  min-height: 0;
 }
 
 .panel-header {
@@ -47,6 +50,7 @@ body {
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+  min-height: 2.375rem;
 }
 
 .panel-header h2 {
@@ -58,6 +62,166 @@ body {
   display: flex;
   gap: 1rem;
   font-size: 0.9rem;
+}
+
+.options-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem;
+  background: #f0f4f8;
+  border-radius: 6px;
+  min-height: 3.125rem;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.option-label {
+  color: #486581;
+  white-space: nowrap;
+}
+
+.option-checkbox {
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-input {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.85rem;
+  color: #1f2933;
+}
+
+#board-select {
+  min-width: 9rem;
+  width: 9rem;
+}
+
+.text-input {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.85rem;
+  color: #1f2933;
+}
+
+.deploy-bar .host-input {
+  width: 8.5rem;
+  min-width: 8.5rem;
+}
+
+.deploy-bar .user-input,
+.deploy-bar .password-input {
+  width: 6.5rem;
+  min-width: 6.5rem;
+}
+
+.port-input {
+  width: 4rem;
+  min-width: 4rem;
+}
+
+.transport-input {
+  width: 7.5rem;
+  min-width: 7.5rem;
+  padding-right: 1.75rem;
+}
+
+.deploy-bar {
+  overflow-x: auto;
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.editor-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 360px;
+  resize: vertical;
+  padding: 0.75rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.drop-zone {
+  border: 2px dashed #bcccdc;
+  border-radius: 6px;
+  padding: 2rem;
+  text-align: center;
+  color: #627d98;
+  cursor: pointer;
+  flex: 1;
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drop-zone input[type="file"] {
+  display: none;
+}
+
+.panel-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 2.375rem;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-self: flex-start;
+}
+
+.deploy-status {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.deploy-status.success {
+  color: #0f7b3a;
+}
+
+.deploy-status.error {
+  color: #b00020;
+}
+
+.output-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.board-info {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #627d98;
 }
 
 .input-tabs {
@@ -120,41 +284,6 @@ body {
   border-color: #486581;
 }
 
-textarea {
-  width: 100%;
-  min-height: 360px;
-  resize: vertical;
-  padding: 0.75rem;
-  border: 1px solid #d9e2ec;
-  border-radius: 6px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-
-.drop-zone {
-  border: 2px dashed #bcccdc;
-  border-radius: 6px;
-  padding: 2rem;
-  text-align: center;
-  color: #627d98;
-  cursor: pointer;
-  min-height: 360px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.drop-zone input[type="file"] {
-  display: none;
-}
-
-.panel-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-self: flex-start;
-}
-
 .actions {
   display: flex;
   gap: 0.5rem;
@@ -173,5 +302,13 @@ textarea {
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .panel {
+    grid-row: auto;
+    grid-template-rows: none;
+    display: flex;
+    flex-direction: column;
   }
 }

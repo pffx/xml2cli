@@ -1,0 +1,16 @@
+module: bbf-l2-dhcpv4-relay-forwarding
+
+  augment /bbf-l2-fwd:forwarding/bbf-l2-fwd:forwarders/bbf-l2-fwd:forwarder:
+    +--rw l2-dhcpv4-relay!
+       +--rw downstream-broadcast-flooding?   union
+
+module: bbf-l2-dhcpv4-relay
+  +--rw l2-dhcpv4-relay-profiles
+     +--rw l2-dhcpv4-relay-profile* [name]
+        +--rw name                                     nok-typ:nokia-string-ascii64
+        +--rw max-packet-size?                         uint16
+        +--rw option82-format
+        |  +--rw suboptions*                                            enumeration
+        |  +--rw default-circuit-id-syntax?                             bbf-yang:string-ascii63-or-empty
+        |  +--rw default-remote-id-syntax?                              bbf-yang:string-ascii63-or-empty
+        |  +--rw access-loop-suboptions?                                bbf-subtype:broadband-line-characteristics

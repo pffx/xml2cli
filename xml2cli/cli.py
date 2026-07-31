@@ -31,6 +31,18 @@ def main(argv: list[str] | None = None) -> int:
     serve_parser.add_argument("--host", default="0.0.0.0")
     serve_parser.add_argument("--port", type=int, default=8888)
 
+    build_schemas_parser = subparsers.add_parser(
+        "build-schemas",
+        help="Build YANG board schemas to JSON",
+    )
+    build_schemas_parser.add_argument("--board", help="Build schema for a single board id")
+    build_schemas_parser.add_argument(
+        "--yang-tree",
+        choices=("standard", "all"),
+        default="standard",
+        help="YANG tree variant to parse (default: standard)",
+    )
+
     args = parser.parse_args(argv)
 
     if args.command == "xml2cli":
@@ -39,6 +51,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_cli2xml(args)
     if args.command == "serve":
         return _cmd_serve(args)
+    if args.command == "build-schemas":
+        return _cmd_build_schemas(args)
     return 1
 
 
@@ -126,6 +140,15 @@ def _cmd_serve(args: argparse.Namespace) -> int:
     app = create_app()
     uvicorn.run(app, host=args.host, port=args.port)
     return 0
+
+
+def _cmd_build_schemas(args: argparse.Namespace) -> int:
+    from xml2cli.build_schemas import main as build_schemas_main
+
+    board_args = ["--yang-tree", args.yang_tree]
+    if args.board:
+        board_args.extend(["--board", args.board])
+    return build_schemas_main(board_args)
 
 
 if __name__ == "__main__":

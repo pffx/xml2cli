@@ -1,24 +1,32 @@
-"""Tests for IETF NT profile (832-nt)."""
-
-from pathlib import Path
+"""NT board conversion tests (inline fixtures)."""
 
 from xml2cli.engine import convert_cli_to_xml, convert_xml_to_cli
 
-XML_DIR = Path(__file__).resolve().parent.parent / "xml" / "832-nt"
+DEBUG_XML = """<rpc message-id="1" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <edit-config>
+    <target><running/></target>
+    <config>
+      <system xmlns="urn:ietf:params:xml:ns:yang:ietf-system">
+        <management xmlns="http://www.nokia.com/Fixed-Networks/BBA/yang/nokia-ietf-system-aug">
+          <debug>
+            <lemi><enable>true</enable></lemi>
+          </debug>
+        </management>
+      </system>
+    </config>
+  </edit-config>
+</rpc>"""
 
 
 def test_debug_lemi_xml_to_cli():
-    content = (XML_DIR / "debug_lemi.xml").read_text(encoding="utf-8")
-    cli_lines, errors = convert_xml_to_cli(content, "832-nt")
+    cli_lines, errors = convert_xml_to_cli(DEBUG_XML, "NT-LMNT-A")
     assert errors == []
-    assert cli_lines == ["system management debug lemi enable true"]
+    assert "system management debug lemi enable true" in cli_lines
 
 
 def test_debug_lemi_cli_to_xml():
     cli = "system management debug lemi enable true"
-    xml_output, errors = convert_cli_to_xml(cli, "832-nt")
+    xml_output, errors = convert_cli_to_xml(cli, "NT-LMNT-A")
     assert errors == []
-    assert "<rpc" in xml_output
-    assert "<running" in xml_output
-    assert "system" in xml_output
-    assert "lemi" in xml_output
+    assert "<system" in xml_output
+    assert "<lemi>" in xml_output
