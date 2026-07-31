@@ -2,17 +2,29 @@
 
 from __future__ import annotations
 
+import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Optional
 
 NETCONF_NS = "urn:ietf:params:xml:ns:netconf:base:1.0"
 
+_LITERAL_COLON = "__COLON__"
+_NUMERIC_KEY_PREFIX = "__key__"
+
+_TAG_WITH_COLON_RE = re.compile(
+    r"(</?)([A-Za-z_][\w.-]*):([A-Za-z_][\w.-]*)((?:\s[^>]*)?>)"
+)
+_NUMERIC_TAG_RE = re.compile(r"(</?)(\d+)((?:\s[^>]*)?>)")
+_XMLNS_PREFIX_RE = re.compile(r"\bxmlns:([A-Za-z_][\w.-]*)\s*=")
+
 
 def local_name(tag: str) -> str:
     if tag.startswith("{"):
-        return tag.split("}", 1)[1]
-    return tag
+        name = tag.split("}", 1)[1]
+    else:
+        name = tag
+    return _decode_sanitized_tag_name(name)
 
 
 def get_namespace(tag: str) -> Optional[str]:
@@ -35,9 +47,20 @@ class RpcDocument:
     payload: Optional[ET.Element] = None
 
 
+def sanitize_netconf_xml(xml_content: str) -> str:
+    """Normalize device XML that uses YANG list keys as invalid XML tag names."""
+    declared_prefixes = set(_XMLNS_PREFIX_RE.findall(xml_content))
+    sanitized = _TAG_WITH_COLON_RE.sub(
+        lambda match: _replace_unbound_colon_tag(match, declared_prefixes),
+        xml_content,
+    )
+    return _NUMERIC_TAG_RE.sub(_replace_numeric_tag, sanitized)
+
+
 def parse_rpc(xml_content: str) -> RpcDocument:
+    sanitized = sanitize_netconf_xml(xml_content)
     try:
-        root = ET.fromstring(xml_content)
+        root = ET.fromstring(sanitized)
     except ET.ParseError as exc:
         raise ValueError(f"XML parse error: {exc}") from exc
 
@@ -78,3 +101,22 @@ def element_text(elem: ET.Element) -> str:
 
 def child_elements(elem: ET.Element) -> list[ET.Element]:
     return [child for child in elem if isinstance(child, ET.Element)]
+
+
+def _decode_sanitized_tag_name(name: str) -> str:
+    if name.startswith(_NUMERIC_KEY_PREFIX):
+        return name[len(_NUMERIC_KEY_PREFIX) :]
+    return name.replace(_LITERAL_COLON, ":")
+
+
+def _replace_unbound_colon_tag(match: re.Match[str], declared_prefixes: set[str]) -> str:
+    closing, prefix, local, suffix = match.groups()
+    if prefix in declared_prefixes:
+        return match.group(0)
+    safe_name = f"{prefix}{_LITERAL_COLON}{local}"
+    return f"{closing}{safe_name}{suffix}"
+
+
+def _replace_numeric_tag(match: re.Match[str]) -> str:
+    closing, digits, suffix = match.groups()
+    return f"{closing}{_NUMERIC_KEY_PREFIX}{digits}{suffix}"

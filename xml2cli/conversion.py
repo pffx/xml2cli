@@ -81,6 +81,10 @@ def detect_board_from_xml(xml_content: str) -> Optional[str]:
         "bbf-qos-classifiers-mounted" in xml_content
         or "bbf-xpongemtcont" in xml_content
         or "bbf-qos-policies-mounted" in xml_content
+        or "bbf-xpon-mounted" in xml_content
+        or "bbf-if-port-ref-mounted" in xml_content
+        or "<hardware" in lowered
+        or "<interfaces" in lowered
     ):
         return _DEFAULT_BOARD_BY_FAMILY[FAMILY_LT]
     if (
