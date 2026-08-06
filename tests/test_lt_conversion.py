@@ -23,6 +23,8 @@ def test_lt_qos_cli_lines_merge_without_onus_wrapper():
     xml = family.wrap_edit_config(elems)
     assert "<onus" not in xml
     assert "<xpongemtcont" in xml
+    assert "urn:bbf:yang:bbf-xpongemtcont" in xml
+    assert "bbf-xpongemtcont-mounted" not in xml.split("<xpongemtcont", 1)[1].split(">", 1)[0]
     assert "<classifiers" in xml
     assert "<policies" in xml
     assert "<qos-policy-profiles" in xml

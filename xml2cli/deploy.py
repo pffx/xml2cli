@@ -16,6 +16,41 @@ Transport = Literal["netconf", "cli"]
 
 _RPC_PATTERN = re.compile(r"<rpc\b[^>]*>.*?</rpc>", re.DOTALL | re.IGNORECASE)
 
+# Older confd/Nokia peers often offer only ssh-rsa host keys; paramiko 3+ drops it by default.
+_LEGACY_SSH_KEY_ALGORITHMS = (
+    "ssh-rsa",
+    "rsa-sha2-512",
+    "rsa-sha2-256",
+    "ssh-ed25519",
+    "ecdsa-sha2-nistp256",
+    "ecdsa-sha2-nistp384",
+    "ecdsa-sha2-nistp521",
+)
+
+
+def _configure_legacy_ssh() -> None:
+    """Allow ssh-rsa host keys for older NETCONF/SSH peers (e.g. confd)."""
+    import paramiko
+    from cryptography.hazmat.primitives import hashes
+    from paramiko.rsakey import RSAKey
+
+    paramiko.Transport._preferred_keys = _LEGACY_SSH_KEY_ALGORITHMS
+    paramiko.Transport._preferred_pubkeys = _LEGACY_SSH_KEY_ALGORITHMS
+
+    # paramiko 5 removed ssh-rsa from _key_info; without this, host-key verify
+    # raises KeyError('ssh-rsa') after KEX when the peer only offers ssh-rsa.
+    key_info = dict(paramiko.Transport._key_info)
+    key_info["ssh-rsa"] = RSAKey
+    key_info["ssh-rsa-cert-v01@openssh.com"] = RSAKey
+    paramiko.Transport._key_info = key_info
+
+    # paramiko 5 dropped SHA-1 from RSAKey.HASHES; legacy peers sign KEX with
+    # algorithm name "ssh-rsa" (PKCS1v15 + SHA-1), causing verify_ssh_sig to fail.
+    rsa_hashes = dict(RSAKey.HASHES)
+    rsa_hashes["ssh-rsa"] = hashes.SHA1
+    rsa_hashes["ssh-rsa-cert-v01@openssh.com"] = hashes.SHA1
+    RSAKey.HASHES = rsa_hashes
+
 
 @dataclass(frozen=True, slots=True)
 class DeviceTarget:
@@ -116,6 +151,7 @@ def _deploy_netconf(xml_content: str, target: DeviceTarget) -> DeployResult:
     if not rpc_documents:
         return DeployResult(False, "没有可下发的 NETCONF RPC")
 
+    _configure_legacy_ssh()
     details: list[str] = []
     try:
         with manager.connect(
@@ -155,6 +191,7 @@ def _deploy_cli(cli_content: str, target: DeviceTarget) -> DeployResult:
     if not lines:
         return DeployResult(False, "没有可下发的 CLI 命令")
 
+    _configure_legacy_ssh()
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     channel = None

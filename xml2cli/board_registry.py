@@ -19,6 +19,7 @@ class BoardInfo:
     family: str
     tree_path: Path
     tree_all_path: Path | None = None
+    lt_slot: int | None = None  # LT chassis slot 1–16 → NETCONF ports 833–848
 
 
 def _tree_paths(family: str, board_dir: str, tree_file: str) -> tuple[Path, Path | None]:
@@ -29,13 +30,20 @@ def _tree_paths(family: str, board_dir: str, tree_file: str) -> tuple[Path, Path
     return tree_path, family_root / tree_file.replace("_yang_tree.txt", "_yang_tree_all.txt")
 
 
-def _board(board_id: str, family: str, board_dir: str, tree_file: str) -> BoardInfo:
+def _board(
+    board_id: str,
+    family: str,
+    board_dir: str,
+    tree_file: str,
+    lt_slot: int | None = None,
+) -> BoardInfo:
     tree_path, tree_all_path = _tree_paths(family, board_dir, tree_file)
     return BoardInfo(
         board_id=board_id,
         family=family,
         tree_path=tree_path,
         tree_all_path=tree_all_path,
+        lt_slot=lt_slot,
     )
 
 
@@ -52,9 +60,9 @@ _BOARDS: tuple[BoardInfo, ...] = (
     _board("NT-LMNT-B", FAMILY_NT, "LMNT-B", "LS-MF-LMNT-B_yang_tree.txt"),
     _board("NT-LMNT-C", FAMILY_NT, "LMNT-C", "LS-MF-LMNT-C_yang_tree.txt"),
     _board("NT-LMNT-D", FAMILY_NT, "LMNT-D", "LS-MF-LMNT-D_yang_tree.txt"),
-    _board("LLLT-A", FAMILY_LT, "LLLT-A", "LS-MF-LLLT-A_yang_tree.txt"),
-    _board("LWLT-C", FAMILY_LT, "LWLT-C", "LS-MF-LWLT-C_yang_tree.txt"),
-    _board("LGLT-D", FAMILY_LT, "LGLT-D", "LS-MF-LGLT-D_yang_tree.txt"),
+    _board("LLLT-A", FAMILY_LT, "LLLT-A", "LS-MF-LLLT-A_yang_tree.txt", lt_slot=2),
+    _board("LWLT-C", FAMILY_LT, "LWLT-C", "LS-MF-LWLT-C_yang_tree.txt", lt_slot=1),
+    _board("LGLT-D", FAMILY_LT, "LGLT-D", "LS-MF-LGLT-D_yang_tree.txt", lt_slot=3),
 )
 
 _BOARD_INDEX = {board.board_id: board for board in _BOARDS}

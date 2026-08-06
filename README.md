@@ -39,9 +39,11 @@ xml2cli cli2xml "classifiers classifier-entry eg0 ..." --profile LWLT-C
 xml2cli serve --host 0.0.0.0 --port 8888
 ```
 
-Web UI supports board selection and pushing generated CLI/XML to devices via NETCONF (port 830) or SSH CLI (port 22).
+Web UI supports board selection and pushing generated CLI/XML to devices.
 
-Legacy profile names still map: `831-ihub` → `IHUB-LMNT-A`, `832-nt` → `NT-LMNT-A`, `833-LT-1` → `LWLT-C`.
+NETCONF ports follow chassis layout: **831** IHUB, **832** NT, **833–848** LT slots 1–16. CLI SSH uses port **22**.
+
+Legacy profile names still map: `831-ihub` → `IHUB-LMNT-A`, `832-nt` → `NT-LMNT-A`, `833-LT-1` → `LWLT-C` (port 833).
 
 ## Tests
 

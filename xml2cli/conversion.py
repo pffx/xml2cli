@@ -294,9 +294,16 @@ def _find_child(parent: ET.Element | None, name: str) -> ET.Element | None:
     return None
 
 
-def board_info_dict(board: BoardInfo) -> dict[str, str]:
-    return {
+from xml2cli.netconf_ports import netconf_port_for_board
+
+
+def board_info_dict(board: BoardInfo) -> dict[str, str | int]:
+    info: dict[str, str | int] = {
         "id": board.board_id,
         "family": board.family,
         "tree_path": str(board.tree_path),
+        "netconf_port": netconf_port_for_board(board.board_id),
     }
+    if board.lt_slot is not None:
+        info["lt_slot"] = board.lt_slot
+    return info

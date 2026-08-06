@@ -11,6 +11,8 @@ from xml2cli.yang.schema import BoardSchema, SchemaNode
 from xml2cli.yang.schema_store import load_schema
 
 ONU_NS = "urn:bbf:params:xml:ns:yang:bbf-fiber-onu-emulated-mount"
+XPONGEMTCONT_NS = "urn:bbf:yang:bbf-xpongemtcont"
+XPONGEMTCONT_MOUNTED_NS = "urn:bbf:yang:bbf-xpongemtcont-mounted"
 
 STRUCTURE_KINDS = {"container", "list", "presence-container", "choice", "case"}
 
@@ -18,7 +20,7 @@ _LT_ROOT_NS: dict[str, str] = {
     "classifiers": "urn:bbf:yang:bbf-qos-classifiers-mounted",
     "policies": "urn:bbf:yang:bbf-qos-policies-mounted",
     "qos-policy-profiles": "urn:bbf:yang:bbf-qos-policies-mounted",
-    "xpongemtcont": "urn:bbf:yang:bbf-xpongemtcont-mounted",
+    "xpongemtcont": XPONGEMTCONT_NS,
     "onus": ONU_NS,
 }
 
@@ -26,7 +28,8 @@ _PREFIX_TO_NS: dict[str, str] = {
     "bbf-qos-cls-mounted": "urn:bbf:yang:bbf-qos-classifiers-mounted",
     "bbf-qos-pol-mounted": "urn:bbf:yang:bbf-qos-policies-mounted",
     "bbf-qos-plc-mounted": "urn:bbf:yang:bbf-qos-policing-mounted",
-    "bbf-xpongemtcont-frommounted": "urn:bbf:yang:bbf-xpongemtcont-mounted",
+    "bbf-xpongemtcont": XPONGEMTCONT_NS,
+    "bbf-xpongemtcont-frommounted": XPONGEMTCONT_MOUNTED_NS,
     "if-frommounted": "urn:ietf:params:xml:ns:yang:ietf-interfaces-mounted",
 }
 

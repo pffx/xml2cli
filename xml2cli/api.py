@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -42,7 +42,7 @@ class Cli2XmlResponse(BaseModel):
 
 
 class BoardsResponse(BaseModel):
-    boards: list[dict[str, str]]
+    boards: list[dict[str, Any]]
 
 
 class DetectBoardResponse(BaseModel):

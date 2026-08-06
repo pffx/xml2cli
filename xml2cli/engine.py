@@ -5,19 +5,14 @@ from __future__ import annotations
 from typing import Optional
 
 from xml2cli import conversion
-
-_LEGACY_PROFILE_TO_BOARD = {
-    "831-ihub": "IHUB-LMNT-A",
-    "832-nt": "NT-LMNT-A",
-    "833-LT-1": "LWLT-C",
-    "sr_os": "IHUB-LMNT-A",
-    "ietf_nt": "NT-LMNT-A",
-    "onu_lt": "LWLT-C",
-}
+from xml2cli.netconf_ports import resolve_legacy_profile_name
 
 
 def _resolve_board_id(name: str) -> str:
-    return _LEGACY_PROFILE_TO_BOARD.get(name, name)
+    legacy = resolve_legacy_profile_name(name)
+    if legacy is not None:
+        return legacy
+    return name
 
 
 def detect_profile_from_xml(xml_content: str) -> Optional[str]:

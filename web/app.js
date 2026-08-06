@@ -22,11 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentMode = "xml2cli";
   let lastDetectedBoard = null;
+  const boardNetconfPorts = {};
 
-  const DEFAULT_PORTS = {
-    netconf: "830",
-    cli: "22",
-  };
+  const CLI_SSH_PORT = "22";
 
   const FAMILY_LABELS = {
     IHUB: "IHUB",
@@ -71,7 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateDeployPortForMode() {
-    devicePort.value = currentMode === "xml2cli" ? DEFAULT_PORTS.cli : DEFAULT_PORTS.netconf;
+    if (currentMode === "xml2cli") {
+      devicePort.value = CLI_SSH_PORT;
+      return;
+    }
+    const board = boardSelect.value.trim() || lastDetectedBoard;
+    const port = board && boardNetconfPorts[board];
+    devicePort.value = port ? String(port) : String(831);
   }
 
   function setBoardInfo(board, yangTree) {
@@ -84,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const treeLabel = yangTree === "all" ? "（完整树）" : "";
     boardInfoEl.textContent = `板卡: ${board}${treeLabel}`;
     boardInfoEl.classList.remove("hidden");
+    updateDeployPortForMode();
   }
 
   function clearAllText() {
@@ -119,6 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const option = document.createElement("option");
         option.value = board.id;
         option.textContent = board.id;
+        if (board.netconf_port) {
+          boardNetconfPorts[board.id] = board.netconf_port;
+        }
         optgroup.appendChild(option);
       }
       boardSelect.appendChild(optgroup);
@@ -185,6 +193,10 @@ document.addEventListener("DOMContentLoaded", () => {
           ? "粘贴 NETCONF XML..."
           : "粘贴 CLI 命令（每行一条）...";
     });
+  });
+
+  boardSelect.addEventListener("change", () => {
+    updateDeployPortForMode();
   });
 
   dropZone.addEventListener("click", () => fileInput.click());

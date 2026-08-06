@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from xml2cli.api import create_app
 from xml2cli.deploy import (
     DeviceTarget,
+    _configure_legacy_ssh,
     deploy_to_device,
     prepare_deploy_payload,
     split_rpc_documents,
@@ -60,6 +61,32 @@ def test_prepare_deploy_payload_requires_board_for_cross_format():
             transport="netconf",
             board=None,
         )
+
+
+def test_configure_legacy_ssh_includes_ssh_rsa():
+    pytest.importorskip("paramiko")
+    from cryptography.hazmat.primitives import hashes
+    import paramiko
+
+    _configure_legacy_ssh()
+    assert paramiko.Transport._preferred_keys[0] == "ssh-rsa"
+    assert paramiko.Transport._preferred_pubkeys[0] == "ssh-rsa"
+    assert "ssh-rsa" in paramiko.Transport._key_info
+    from paramiko.rsakey import RSAKey
+
+    assert RSAKey.HASHES["ssh-rsa"] == hashes.SHA1
+
+
+def test_legacy_ssh_rsa_signature_verification():
+    pytest.importorskip("paramiko")
+    from paramiko.message import Message
+    from paramiko.rsakey import RSAKey
+
+    _configure_legacy_ssh()
+    key = RSAKey.generate(2048)
+    data = b"exchange-hash"
+    sig_bytes = key.sign_ssh_data(data, algorithm="ssh-rsa").asbytes()
+    assert key.verify_ssh_sig(data, Message(sig_bytes)) is True
 
 
 @patch("ncclient.manager.connect")
