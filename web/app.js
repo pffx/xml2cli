@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const devicePort = document.getElementById("device-port");
   const deviceUser = document.getElementById("device-user");
   const devicePassword = document.getElementById("device-password");
+  const devicePasswordToggle = document.getElementById("device-password-toggle");
+  const clearDeviceBtn = document.getElementById("clear-device-btn");
   const deployBtn = document.getElementById("deploy-btn");
   const deployStatusEl = document.getElementById("deploy-status");
   const pastePanel = document.getElementById("paste-panel");
@@ -89,6 +91,21 @@ document.addEventListener("DOMContentLoaded", () => {
     boardInfoEl.textContent = `板卡: ${board}${treeLabel}`;
     boardInfoEl.classList.remove("hidden");
     updateDeployPortForMode();
+  }
+
+  function clearDeviceFields() {
+    deviceHost.value = "";
+    deviceUser.value = "";
+    devicePassword.value = "";
+    if (devicePassword.type === "text") {
+      devicePassword.type = "password";
+      devicePasswordToggle.setAttribute("aria-label", "显示密码");
+      devicePasswordToggle.setAttribute("title", "显示密码");
+      devicePasswordToggle.querySelector(".icon-eye-open").classList.remove("hidden");
+      devicePasswordToggle.querySelector(".icon-eye-closed").classList.add("hidden");
+    }
+    updateDeployPortForMode();
+    clearDeployStatus();
   }
 
   function clearAllText() {
@@ -197,6 +214,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   boardSelect.addEventListener("change", () => {
     updateDeployPortForMode();
+  });
+
+  devicePasswordToggle.addEventListener("click", () => {
+    const show = devicePassword.type === "password";
+    devicePassword.type = show ? "text" : "password";
+    devicePasswordToggle.setAttribute("aria-label", show ? "隐藏密码" : "显示密码");
+    devicePasswordToggle.setAttribute("title", show ? "隐藏密码" : "显示密码");
+    devicePasswordToggle.querySelector(".icon-eye-open").classList.toggle("hidden", show);
+    devicePasswordToggle.querySelector(".icon-eye-closed").classList.toggle("hidden", !show);
+  });
+
+  clearDeviceBtn.addEventListener("click", () => {
+    clearDeviceFields();
   });
 
   dropZone.addEventListener("click", () => fileInput.click());

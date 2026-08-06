@@ -127,6 +127,49 @@ body {
   min-width: 6.5rem;
 }
 
+.option-password {
+  flex-shrink: 0;
+}
+
+.password-field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.password-field .password-input {
+  padding-right: 1.75rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: #627d98;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: #243b53;
+  background: #e3e9f0;
+}
+
+.clear-device-btn {
+  min-width: 4.5rem;
+  height: 2rem;
+  padding: 0.35rem 0.75rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .port-input {
   width: 4rem;
   min-width: 4rem;
