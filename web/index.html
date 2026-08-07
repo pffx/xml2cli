@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>xml2cli</title>
-  <link rel="stylesheet" href="/static/style.css?v=17" />
+  <link rel="stylesheet" href="/static/style.css?v=18" />
 </head>
 <body>
   <header class="header">
@@ -77,8 +77,8 @@
           <input type="text" id="device-host" class="text-input host-input" placeholder="IP" />
         </label>
         <label class="option">
-          <span class="option-label">端口</span>
-          <input type="number" id="device-port" class="text-input port-input" value="22" min="1" max="65535" />
+          <span class="option-label">板卡</span>
+          <select id="deploy-board-select" class="select-input deploy-board-select" title="选择板卡后自动关联 NETCONF 端口"></select>
         </label>
         <label class="option">
           <span class="option-label">用户名</span>
@@ -128,6 +128,6 @@
     </section>
   </main>
 
-  <script src="/static/app.js?v=17"></script>
+  <script src="/static/app.js?v=18"></script>
 </body>
 </html>

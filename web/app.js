@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const boardSelect = document.getElementById("board-select");
   const yangTreeAll = document.getElementById("yang-tree-all");
   const deviceHost = document.getElementById("device-host");
-  const devicePort = document.getElementById("device-port");
+  const deployBoardSelect = document.getElementById("deploy-board-select");
   const deviceUser = document.getElementById("device-user");
   const devicePassword = document.getElementById("device-password");
   const devicePasswordToggle = document.getElementById("device-password-toggle");
@@ -24,9 +24,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentMode = "xml2cli";
   let lastDetectedBoard = null;
-  const boardNetconfPorts = {};
+  const boardMeta = {};
 
-  const CLI_SSH_PORT = "22";
+  const CLI_SSH_PORT = 22;
+  const NETCONF_PORT_IHUB = 831;
+  const NETCONF_PORT_NT = 832;
+  const NETCONF_PORT_LT_BASE = 833;
+
+  const LT_SLOT_BOARD_IDS = {
+    1: "LWLT-C",
+    2: "LLLT-A",
+    3: "LGLT-D",
+  };
+
+  const DEPLOY_SLOTS = [
+    { id: "ihub", label: "IHUB", port: NETCONF_PORT_IHUB, boardId: "IHUB-LMNT-A" },
+    { id: "nt", label: "NT", port: NETCONF_PORT_NT, boardId: "NT-LMNT-A" },
+  ];
+
+  for (let slot = 1; slot <= 16; slot += 1) {
+    DEPLOY_SLOTS.push({
+      id: `lt-${slot}`,
+      label: `LT${slot}`,
+      port: NETCONF_PORT_LT_BASE + slot - 1,
+      boardId: LT_SLOT_BOARD_IDS[slot] || "LWLT-C",
+    });
+  }
+
+  const deploySlotById = Object.fromEntries(DEPLOY_SLOTS.map((slot) => [slot.id, slot]));
 
   const FAMILY_LABELS = {
     IHUB: "IHUB",
@@ -58,8 +83,90 @@ document.addEventListener("DOMContentLoaded", () => {
     deployStatusEl.className = `deploy-status ${isSuccess ? "success" : "error"}`;
   }
 
-  function getSelectedBoard() {
+  function getSelectedConversionBoard() {
     return boardSelect.value.trim() || lastDetectedBoard || null;
+  }
+
+  function getDeploySlot() {
+    const slotId = deployBoardSelect.value;
+    return deploySlotById[slotId] || deploySlotById.ihub;
+  }
+
+  function getDeployPort() {
+    if (currentMode === "xml2cli") {
+      return CLI_SSH_PORT;
+    }
+    return getDeploySlot().port;
+  }
+
+  function getDeployBoardId() {
+    const conversionBoard = getSelectedConversionBoard();
+    if (conversionBoard) {
+      return conversionBoard;
+    }
+    return getDeploySlot().boardId;
+  }
+
+  function populateDeployBoardSelect() {
+    const ihubGroup = document.createElement("optgroup");
+    ihubGroup.label = "IHUB";
+    const ntGroup = document.createElement("optgroup");
+    ntGroup.label = "NT";
+    const ltGroup = document.createElement("optgroup");
+    ltGroup.label = "LT";
+
+    deployBoardSelect.replaceChildren();
+
+    for (const slot of DEPLOY_SLOTS) {
+      const option = document.createElement("option");
+      option.value = slot.id;
+      option.textContent = `${slot.label} (${slot.port})`;
+      if (slot.id === "ihub") {
+        ihubGroup.appendChild(option);
+      } else if (slot.id === "nt") {
+        ntGroup.appendChild(option);
+      } else {
+        ltGroup.appendChild(option);
+      }
+    }
+
+    deployBoardSelect.append(ihubGroup, ntGroup, ltGroup);
+    deployBoardSelect.value = "ihub";
+  }
+
+  function boardIdToDeploySlot(boardId) {
+    const meta = boardMeta[boardId];
+    if (!meta) {
+      return "ihub";
+    }
+    if (meta.family === "IHUB") {
+      return "ihub";
+    }
+    if (meta.family === "NT") {
+      return "nt";
+    }
+    if (meta.lt_slot) {
+      return `lt-${meta.lt_slot}`;
+    }
+    return "lt-1";
+  }
+
+  function syncDeployBoardFromConversionBoard(boardId) {
+    if (!boardId || currentMode !== "cli2xml") {
+      return;
+    }
+    const slotId = boardIdToDeploySlot(boardId);
+    if (deploySlotById[slotId]) {
+      deployBoardSelect.value = slotId;
+    }
+  }
+
+  function updateDeployBoardForMode() {
+    const isNetconf = currentMode === "cli2xml";
+    deployBoardSelect.disabled = !isNetconf;
+    if (isNetconf && lastDetectedBoard) {
+      syncDeployBoardFromConversionBoard(lastDetectedBoard);
+    }
   }
 
   function getOutputContentFormat() {
@@ -70,16 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return currentMode === "xml2cli" ? "cli" : "netconf";
   }
 
-  function updateDeployPortForMode() {
-    if (currentMode === "xml2cli") {
-      devicePort.value = CLI_SSH_PORT;
-      return;
-    }
-    const board = boardSelect.value.trim() || lastDetectedBoard;
-    const port = board && boardNetconfPorts[board];
-    devicePort.value = port ? String(port) : String(831);
-  }
-
   function setBoardInfo(board, yangTree) {
     lastDetectedBoard = board || null;
     if (!board) {
@@ -88,9 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const treeLabel = yangTree === "all" ? "（完整树）" : "";
-    boardInfoEl.textContent = `板卡: ${board}${treeLabel}`;
+    const slot = getDeploySlot();
+    const portHint =
+      currentMode === "cli2xml" ? ` · NETCONF ${slot.port}` : " · SSH 22";
+    boardInfoEl.textContent = `板卡: ${board}${treeLabel}${portHint}`;
     boardInfoEl.classList.remove("hidden");
-    updateDeployPortForMode();
+    syncDeployBoardFromConversionBoard(board);
   }
 
   function clearDeviceFields() {
@@ -104,7 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
       devicePasswordToggle.querySelector(".icon-eye-open").classList.remove("hidden");
       devicePasswordToggle.querySelector(".icon-eye-closed").classList.add("hidden");
     }
-    updateDeployPortForMode();
+    deployBoardSelect.value = "ihub";
+    updateDeployBoardForMode();
     clearDeployStatus();
   }
 
@@ -141,9 +242,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const option = document.createElement("option");
         option.value = board.id;
         option.textContent = board.id;
-        if (board.netconf_port) {
-          boardNetconfPorts[board.id] = board.netconf_port;
-        }
+        boardMeta[board.id] = {
+          family: board.family,
+          lt_slot: board.lt_slot ?? null,
+          netconf_port: board.netconf_port ?? null,
+        };
         optgroup.appendChild(option);
       }
       boardSelect.appendChild(optgroup);
@@ -204,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[name="mode"]').forEach((radio) => {
     radio.addEventListener("change", () => {
       currentMode = getMode();
-      updateDeployPortForMode();
+      updateDeployBoardForMode();
       inputText.placeholder =
         currentMode === "xml2cli"
           ? "粘贴 NETCONF XML..."
@@ -212,8 +315,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  boardSelect.addEventListener("change", () => {
-    updateDeployPortForMode();
+  deployBoardSelect.addEventListener("change", () => {
+    clearDeployStatus();
+    if (lastDetectedBoard) {
+      const treeLabel = yangTreeAll.checked ? "（完整树）" : "";
+      const slot = getDeploySlot();
+      boardInfoEl.textContent = `板卡: ${lastDetectedBoard}${treeLabel} · NETCONF ${slot.port}`;
+    }
   });
 
   devicePasswordToggle.addEventListener("click", () => {
@@ -344,7 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const host = deviceHost.value.trim();
     const username = deviceUser.value.trim();
-    const port = Number.parseInt(devicePort.value, 10);
+    const port = getDeployPort();
     if (!host) {
       showDeployStatus("请输入设备地址", false);
       return;
@@ -353,12 +461,8 @@ document.addEventListener("DOMContentLoaded", () => {
       showDeployStatus("请输入用户名", false);
       return;
     }
-    if (!Number.isFinite(port) || port < 1 || port > 65535) {
-      showDeployStatus("端口号无效", false);
-      return;
-    }
 
-    const board = getSelectedBoard();
+    const board = getDeployBoardId();
     const transport = getDeployTransport();
     const contentFormat = getOutputContentFormat();
 
@@ -401,6 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  populateDeployBoardSelect();
   loadBoards();
-  updateDeployPortForMode();
+  updateDeployBoardForMode();
 });
