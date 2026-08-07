@@ -107,7 +107,53 @@ document.addEventListener("DOMContentLoaded", () => {
     return getDeploySlot().boardId;
   }
 
-  function populateDeployBoardSelect() {
+  function getActiveInputBoard() {
+    return boardSelect.value.trim() || lastDetectedBoard || null;
+  }
+
+  function boardFamily(boardId) {
+    const meta = boardMeta[boardId];
+    return meta?.family || null;
+  }
+
+  function deploySlotsForBoard(boardId) {
+    const family = boardFamily(boardId);
+    if (!family) {
+      return DEPLOY_SLOTS;
+    }
+    if (family === "IHUB") {
+      return DEPLOY_SLOTS.filter((slot) => slot.id === "ihub");
+    }
+    if (family === "NT") {
+      return DEPLOY_SLOTS.filter((slot) => slot.id === "nt");
+    }
+    // LT: chassis has 16 slots; input board type is schema-only — show all slots.
+    return DEPLOY_SLOTS.filter((slot) => slot.id.startsWith("lt-"));
+  }
+
+  function pickPreferredDeploySlot(boardId, slots, previousSlotId) {
+    if (slots.some((slot) => slot.id === previousSlotId)) {
+      return previousSlotId;
+    }
+    if (!boardId) {
+      return slots[0]?.id || "ihub";
+    }
+    const family = boardFamily(boardId);
+    if (family === "IHUB") {
+      return "ihub";
+    }
+    if (family === "NT") {
+      return "nt";
+    }
+    if (family === "LT") {
+      return "lt-1";
+    }
+    return slots[0]?.id || "ihub";
+  }
+
+  function refreshDeployBoardSelect(boardId) {
+    const previousSlotId = deployBoardSelect.value;
+    const slots = deploySlotsForBoard(boardId);
     const ihubGroup = document.createElement("optgroup");
     ihubGroup.label = "IHUB";
     const ntGroup = document.createElement("optgroup");
@@ -117,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     deployBoardSelect.replaceChildren();
 
-    for (const slot of DEPLOY_SLOTS) {
+    for (const slot of slots) {
       const option = document.createElement("option");
       option.value = slot.id;
       option.textContent = `${slot.label} (${slot.port})`;
@@ -130,43 +176,39 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    deployBoardSelect.append(ihubGroup, ntGroup, ltGroup);
-    deployBoardSelect.value = "ihub";
+    if (ihubGroup.children.length > 0) {
+      deployBoardSelect.appendChild(ihubGroup);
+    }
+    if (ntGroup.children.length > 0) {
+      deployBoardSelect.appendChild(ntGroup);
+    }
+    if (ltGroup.children.length > 0) {
+      deployBoardSelect.appendChild(ltGroup);
+    }
+
+    const preferredSlotId = pickPreferredDeploySlot(boardId, slots, previousSlotId);
+    deployBoardSelect.value = preferredSlotId;
   }
 
-  function boardIdToDeploySlot(boardId) {
-    const meta = boardMeta[boardId];
-    if (!meta) {
-      return "ihub";
+  function updateBoardInfoPortHint() {
+    if (!lastDetectedBoard || boardInfoEl.classList.contains("hidden")) {
+      return;
     }
-    if (meta.family === "IHUB") {
-      return "ihub";
-    }
-    if (meta.family === "NT") {
-      return "nt";
-    }
-    if (meta.lt_slot) {
-      return `lt-${meta.lt_slot}`;
-    }
-    return "lt-1";
+    const treeLabel = yangTreeAll.checked ? "（完整树）" : "";
+    const slot = getDeploySlot();
+    const portHint =
+      currentMode === "cli2xml" ? ` · NETCONF ${slot.port}` : " · SSH 22";
+    boardInfoEl.textContent = `板卡: ${lastDetectedBoard}${treeLabel}${portHint}`;
   }
 
   function syncDeployBoardFromConversionBoard(boardId) {
-    if (!boardId || currentMode !== "cli2xml") {
-      return;
-    }
-    const slotId = boardIdToDeploySlot(boardId);
-    if (deploySlotById[slotId]) {
-      deployBoardSelect.value = slotId;
-    }
+    refreshDeployBoardSelect(boardId);
   }
 
   function updateDeployBoardForMode() {
     const isNetconf = currentMode === "cli2xml";
     deployBoardSelect.disabled = !isNetconf;
-    if (isNetconf && lastDetectedBoard) {
-      syncDeployBoardFromConversionBoard(lastDetectedBoard);
-    }
+    refreshDeployBoardSelect(getActiveInputBoard());
   }
 
   function getOutputContentFormat() {
@@ -182,6 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!board) {
       boardInfoEl.textContent = "";
       boardInfoEl.classList.add("hidden");
+      refreshDeployBoardSelect(getActiveInputBoard());
       return;
     }
     const treeLabel = yangTree === "all" ? "（完整树）" : "";
@@ -205,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
       devicePasswordToggle.querySelector(".icon-eye-closed").classList.add("hidden");
     }
     deployBoardSelect.value = "ihub";
+    refreshDeployBoardSelect(getActiveInputBoard());
     updateDeployBoardForMode();
     clearDeployStatus();
   }
@@ -261,6 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const data = await response.json();
       populateBoardSelect(data.boards || []);
+      refreshDeployBoardSelect(getActiveInputBoard());
     } catch {
       // Board list is optional; auto-detect still works.
     }
@@ -304,6 +349,11 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
 
+  boardSelect.addEventListener("change", () => {
+    refreshDeployBoardSelect(boardSelect.value.trim() || lastDetectedBoard);
+    updateBoardInfoPortHint();
+  });
+
   document.querySelectorAll('input[name="mode"]').forEach((radio) => {
     radio.addEventListener("change", () => {
       currentMode = getMode();
@@ -317,11 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   deployBoardSelect.addEventListener("change", () => {
     clearDeployStatus();
-    if (lastDetectedBoard) {
-      const treeLabel = yangTreeAll.checked ? "（完整树）" : "";
-      const slot = getDeploySlot();
-      boardInfoEl.textContent = `板卡: ${lastDetectedBoard}${treeLabel} · NETCONF ${slot.port}`;
-    }
+    updateBoardInfoPortHint();
   });
 
   devicePasswordToggle.addEventListener("click", () => {
@@ -505,7 +551,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  populateDeployBoardSelect();
+  refreshDeployBoardSelect(null);
   loadBoards();
   updateDeployBoardForMode();
 });
