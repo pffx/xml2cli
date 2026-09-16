@@ -37,9 +37,12 @@ xml2cli cli2xml "classifiers classifier-entry eg0 ..." --profile LWLT-C
 
 # Start web UI
 xml2cli serve --host 0.0.0.0 --port 8888
+# HTTPS (needed for one-click paste from clipboard when using LAN IP, not localhost):
+# openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj /CN=localhost
+# xml2cli serve --host 0.0.0.0 --port 8888 --ssl-certfile cert.pem --ssl-keyfile key.pem
 ```
 
-Web UI supports board selection and pushing generated CLI/XML to devices.
+Web UI: **Paste** reads the system clipboard when the browser allows it (HTTPS or `http://127.0.0.1`). Plain `http://<LAN-IP>` cannot auto-paste in modern browsers; use Ctrl+V in the input box or HTTPS as above.
 
 NETCONF ports follow chassis layout: **831** IHUB, **832** NT, **833–848** LT slots 1–16. CLI SSH uses port **22**.
 

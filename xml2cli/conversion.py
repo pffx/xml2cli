@@ -146,6 +146,22 @@ def convert_xml_to_cli(
             return ["discard"], []
         return [], [f"discard-changes RPC not supported for board {board_id}"]
 
+    if rpc.rpc_type == "action":
+        if isinstance(family, LtFamily):
+            results: list[str] = []
+            for child in child_elements(rpc.payload):
+                root_name = local_name(child.tag)
+                if root_name not in schema.roots:
+                    continue
+                results.extend(family.action_xml_to_cli_lines(child, schema, []))
+            if not results:
+                return [], [
+                    "未生成 CLI 行；action RPC 路径可能不在 schema 中，"
+                    "或需勾选「完整 YANG 树」"
+                ]
+            return results, []
+        return [], [f"Unsupported RPC type '{rpc.rpc_type}' for board {board_id}"]
+
     if rpc.rpc_type != "edit-config":
         return [], [f"Unsupported RPC type '{rpc.rpc_type}' for board {board_id}"]
 
@@ -160,6 +176,8 @@ def convert_xml_to_cli(
             continue
         results.extend(family.xml_to_cli_lines(child, schema, []))
 
+    if not results:
+        return [], ["未生成 CLI 行；请确认板卡/YANG 树是否匹配，或 XML 路径是否在 schema 中"]
     return results, []
 
 

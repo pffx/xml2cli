@@ -30,6 +30,11 @@ def main(argv: list[str] | None = None) -> int:
     serve_parser = subparsers.add_parser("serve", help="Start web UI and API server")
     serve_parser.add_argument("--host", default="0.0.0.0")
     serve_parser.add_argument("--port", type=int, default=8888)
+    serve_parser.add_argument(
+        "--ssl-certfile",
+        help="PEM certificate for HTTPS (enables clipboard paste in browser on LAN IP)",
+    )
+    serve_parser.add_argument("--ssl-keyfile", help="PEM private key for HTTPS")
 
     build_schemas_parser = subparsers.add_parser(
         "build-schemas",
@@ -138,7 +143,18 @@ def _cmd_serve(args: argparse.Namespace) -> int:
     from xml2cli.api import create_app
 
     app = create_app()
-    uvicorn.run(app, host=args.host, port=args.port)
+    ssl_cert = getattr(args, "ssl_certfile", None)
+    ssl_key = getattr(args, "ssl_keyfile", None)
+    if (ssl_cert is None) ^ (ssl_key is None):
+        print("Error: --ssl-certfile and --ssl-keyfile must be used together", file=sys.stderr)
+        return 1
+    uvicorn.run(
+        app,
+        host=args.host,
+        port=args.port,
+        ssl_certfile=ssl_cert,
+        ssl_keyfile=ssl_key,
+    )
     return 0
 
 

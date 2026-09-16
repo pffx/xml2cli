@@ -345,8 +345,97 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadPanel.classList.toggle("hidden", tab !== "upload");
   }
 
+  async function pasteClipboardIntoInput() {
+    switchTab("paste");
+    inputText.focus();
+    inputText.select();
+
+    const valueBeforePaste = inputText.value;
+    try {
+      if (document.execCommand("paste") && inputText.value !== valueBeforePaste) {
+        clearError();
+        return;
+      }
+    } catch {
+      // fall through
+    }
+
+    if (window.isSecureContext && navigator.clipboard?.readText) {
+      try {
+        const text = await navigator.clipboard.readText();
+        inputText.value = text;
+        clearError();
+        return;
+      } catch {
+        // fall through
+      }
+    }
+
+    inputText.focus();
+    if (!window.isSecureContext) {
+      showError(
+        "当前为 HTTP 访问（非 localhost），浏览器禁止网页读取剪贴板。输入框已聚焦，请按 Ctrl+V / Cmd+V 粘贴；或使用 HTTPS 启动 serve"
+      );
+    } else {
+      showError("无法读取剪贴板，请在输入框内按 Ctrl+V / Cmd+V");
+    }
+  }
+
+  async function copyOutputToClipboard() {
+    if (!outputText.value) {
+      return;
+    }
+    const text = outputText.value;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+    } catch {
+      // fall through
+    }
+
+    outputText.removeAttribute("readonly");
+    outputText.focus();
+    outputText.select();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch {
+      ok = false;
+    }
+    outputText.setAttribute("readonly", "");
+    if (ok) {
+      return;
+    }
+
+    const helper = document.createElement("textarea");
+    helper.value = text;
+    helper.setAttribute("readonly", "");
+    helper.style.position = "fixed";
+    helper.style.left = "-9999px";
+    document.body.appendChild(helper);
+    helper.select();
+    try {
+      ok = document.execCommand("copy");
+    } catch {
+      ok = false;
+    }
+    document.body.removeChild(helper);
+    if (!ok) {
+      showError("无法复制到剪贴板，请选中文本后使用 Ctrl+C / Cmd+C");
+    }
+  }
+
   document.querySelectorAll(".tab").forEach((button) => {
-    button.addEventListener("click", () => switchTab(button.dataset.tab));
+    button.addEventListener("click", () => {
+      const tab = button.dataset.tab;
+      if (tab === "paste") {
+        pasteClipboardIntoInput();
+        return;
+      }
+      switchTab(tab);
+    });
   });
 
   boardSelect.addEventListener("change", () => {
@@ -451,6 +540,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
+      if (
+        currentMode === "xml2cli" &&
+        (!data.cli || data.cli.length === 0) &&
+        !(data.errors && data.errors.length > 0)
+      ) {
+        showError("未生成 CLI 输出");
+        outputText.value = "";
+        setBoardInfo(data.board, yangTree);
+        return;
+      }
+
       outputText.value =
         currentMode === "xml2cli" ? (data.cli || []).join("\n") : data.xml || "";
       setBoardInfo(data.board, yangTree);
@@ -465,11 +565,8 @@ document.addEventListener("DOMContentLoaded", () => {
     clearAllText();
   });
 
-  copyBtn.addEventListener("click", async () => {
-    if (!outputText.value) {
-      return;
-    }
-    await navigator.clipboard.writeText(outputText.value);
+  copyBtn.addEventListener("click", () => {
+    copyOutputToClipboard();
   });
 
   downloadBtn.addEventListener("click", () => {

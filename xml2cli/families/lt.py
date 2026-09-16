@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from typing import Sequence
 
 from xml2cli.families.base import Family
-from xml2cli.xml_parser import NETCONF_NS, local_name
+from xml2cli.xml_parser import NETCONF_NS, get_operation, local_name
 from xml2cli.yang.schema import BoardSchema, SchemaNode
 from xml2cli.yang.schema_store import load_schema
 
@@ -50,8 +50,18 @@ class LtFamily(Family):
         if not token_list:
             raise ValueError("Empty CLI line")
 
+        delete_op = False
+        if token_list[-1] == "delete":
+            delete_op = True
+            token_list = token_list[:-1]
+        if not token_list:
+            raise ValueError("Empty CLI line")
+
         if token_list[0] == "onus":
-            return self._parse_onus_line(token_list, schema)
+            root = self._parse_onus_line(token_list, schema)
+            if delete_op:
+                _apply_netconf_remove(root)
+            return root
 
         root_name = token_list[0]
         if root_name not in schema.roots:
@@ -70,6 +80,8 @@ class LtFamily(Family):
             parent_tag=root_name,
             current_ns=root_ns,
         )
+        if delete_op:
+            _apply_netconf_remove(root_elem)
         return root_elem
 
     def xml_to_cli_lines(
@@ -85,6 +97,21 @@ class LtFamily(Family):
         lines: list[str] = []
         root_node = schema.roots[root_name]
         self._emit_element(elem, root_node, [*path, root_name], lines)
+        return lines
+
+    def action_xml_to_cli_lines(
+        self,
+        elem: ET.Element,
+        schema: BoardSchema,
+        path: list[str],
+    ) -> list[str]:
+        root_name = local_name(elem.tag)
+        if root_name not in schema.roots:
+            raise ValueError(f"Unknown LT action root '{root_name}'")
+
+        lines: list[str] = []
+        root_node = schema.roots[root_name]
+        self._emit_element_for_action(elem, root_node, [*path, root_name], lines)
         return lines
 
     def wrap_edit_config(self, config_elems: Sequence[ET.Element]) -> str:
@@ -241,6 +268,7 @@ class LtFamily(Family):
                     key_elem = _find_child_by_local_name(child, key_name)
                     if key_elem is not None and (key_elem.text or "").strip():
                         line_prefix.append((key_elem.text or "").strip())
+                before = len(lines)
                 self._emit_element(
                     child,
                     child_schema,
@@ -248,6 +276,11 @@ class LtFamily(Family):
                     lines,
                     skip_names=set(child_schema.keys),
                 )
+                if len(lines) == before:
+                    line = " ".join(line_prefix)
+                    if _is_delete_operation(child):
+                        line = f"{line} delete"
+                    lines.append(line)
             elif child_schema.kind in STRUCTURE_KINDS:
                 if list(child):
                     self._emit_element(child, child_schema, [*prefix, name], lines)
@@ -264,6 +297,50 @@ class LtFamily(Family):
                 )
             elif _is_dynamic_key_tag(name):
                 lines.append(" ".join([*prefix, name]))
+
+    def _emit_element_for_action(
+        self,
+        elem: ET.Element,
+        schema_node: SchemaNode,
+        prefix: list[str],
+        lines: list[str],
+        skip_names: set[str] | None = None,
+    ) -> None:
+        skip = skip_names or set()
+        for child in list(elem):
+            name = local_name(child.tag)
+            if name in skip:
+                continue
+            in_schema = name in schema_node.children
+            if not in_schema and _is_yang_action_invocation(child):
+                lines.append(_format_action_cli_line(prefix, child))
+                continue
+
+            child_schema = schema_node.children.get(name) or _passthrough_schema(name)
+
+            if child_schema.kind == "list":
+                line_prefix = [*prefix, name]
+                for key_name in child_schema.keys:
+                    key_elem = _find_child_by_local_name(child, key_name)
+                    if key_elem is not None and (key_elem.text or "").strip():
+                        line_prefix.append((key_elem.text or "").strip())
+                before = len(lines)
+                self._emit_element_for_action(
+                    child,
+                    child_schema,
+                    line_prefix,
+                    lines,
+                    skip_names=set(child_schema.keys),
+                )
+                if len(lines) == before:
+                    lines.append(" ".join(line_prefix))
+            elif child_schema.kind in STRUCTURE_KINDS:
+                if list(child):
+                    self._emit_element_for_action(
+                        child, child_schema, [*prefix, name], lines
+                    )
+            elif (child.text or "").strip():
+                lines.append(" ".join([*prefix, name, (child.text or "").strip()]))
 
 
 def _resolve_child(schema_node: SchemaNode, token: str) -> SchemaNode | None:
@@ -322,6 +399,82 @@ def _find_child_by_local_name(parent: ET.Element, name: str) -> ET.Element | Non
         if local_name(child.tag) == name:
             return child
     return None
+
+
+def _is_delete_operation(elem: ET.Element) -> bool:
+    op = get_operation(elem)
+    return op in {"remove", "delete"}
+
+
+def _apply_netconf_remove(root: ET.Element) -> None:
+    deepest = root
+    while list(deepest):
+        deepest = list(deepest)[-1]
+    deepest.set(f"{{{NETCONF_NS}}}operation", "remove")
+
+
+def _is_yang_action_invocation(elem: ET.Element) -> bool:
+    name = local_name(elem.tag)
+    if name in {"input", "output", "-w"}:
+        return False
+    if _has_config_structure(elem):
+        return False
+    return _collect_action_input_leaves(elem) or not list(elem)
+
+
+def _has_config_structure(elem: ET.Element) -> bool:
+    for child in elem:
+        name = local_name(child.tag)
+        if name in {"input", "output", "-w"}:
+            continue
+        if list(child):
+            return True
+    return False
+
+
+def _collect_action_input_leaves(action_elem: ET.Element) -> list[tuple[str, str]]:
+    leaves: list[tuple[str, str]] = []
+
+    def walk(node: ET.Element, in_input: bool) -> None:
+        name = local_name(node.tag)
+        if name == "output":
+            return
+        if name in {"input", "-w"}:
+            for child in node:
+                walk(child, True)
+            return
+        children = list(node)
+        if not children:
+            value = (node.text or "").strip()
+            if value and node is not action_elem:
+                leaves.append((name, value))
+            return
+        for child in children:
+            walk(child, in_input or name in {"input", "-w"})
+
+    for child in action_elem:
+        walk(child, False)
+
+    if leaves:
+        return leaves
+
+    for child in action_elem:
+        name = local_name(child.tag)
+        if name in {"input", "output", "-w"}:
+            continue
+        if list(child):
+            return []
+        value = (child.text or "").strip()
+        if value:
+            leaves.append((name, value))
+    return leaves
+
+
+def _format_action_cli_line(prefix: list[str], action_elem: ET.Element) -> str:
+    tokens = [*prefix, local_name(action_elem.tag)]
+    for leaf_name, value in _collect_action_input_leaves(action_elem):
+        tokens.extend(["-w", leaf_name, value])
+    return " ".join(tokens)
 
 
 def _is_dynamic_key_tag(name: str) -> bool:
