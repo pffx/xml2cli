@@ -260,7 +260,7 @@ class LtFamily(Family):
             name = local_name(child.tag)
             if name in skip:
                 continue
-            child_schema = schema_node.children.get(name) or _passthrough_schema(name)
+            child_schema = _resolve_child(schema_node, name) or _passthrough_schema(name)
 
             if child_schema.kind == "list":
                 line_prefix = [*prefix, name]
@@ -284,7 +284,15 @@ class LtFamily(Family):
             elif child_schema.kind in STRUCTURE_KINDS:
                 if list(child):
                     self._emit_element(child, child_schema, [*prefix, name], lines)
-                elif _is_dynamic_key_tag(name):
+                elif (child.text or "").strip():
+                    lines.append(
+                        " ".join([*prefix, name, (child.text or "").strip()])
+                    )
+                elif (
+                    child_schema.kind == "presence-container"
+                    or _is_dynamic_key_tag(name)
+                    or not child_schema.children
+                ):
                     lines.append(" ".join([*prefix, name]))
             elif (child.text or "").strip():
                 lines.append(" ".join([*prefix, name, (child.text or "").strip()]))
@@ -295,7 +303,8 @@ class LtFamily(Family):
                     [*prefix, name],
                     lines,
                 )
-            elif _is_dynamic_key_tag(name):
+            else:
+                # empty leaf (e.g. <untagged/>) or presence-like flag
                 lines.append(" ".join([*prefix, name]))
 
     def _emit_element_for_action(

@@ -32,3 +32,34 @@ def test_convert_user_pon_xml_to_cli():
     cli_lines, errors = convert_xml_to_cli(USER_PON_XML, "LWLT-C")
     assert errors == []
     assert any("port-layer-if PORT1_2:xgs" in line for line in cli_lines)
+
+
+def test_parse_bare_edit_config_without_rpc_wrapper():
+    xml = """
+    <edit-config>
+      <target><running/></target>
+      <config>
+        <onus xmlns="urn:bbf:params:xml:ns:yang:bbf-fiber-onu-emulated-mount">
+          <onu>
+            <name>SB-FTTH-template</name>
+            <root>
+              <classifiers xmlns="urn:bbf:yang:bbf-qos-classifiers-mounted">
+                <classifier-entry>
+                  <name>eg0</name>
+                  <filter-operation>match-all-filter</filter-operation>
+                </classifier-entry>
+              </classifiers>
+            </root>
+          </onu>
+        </onus>
+      </config>
+    </edit-config>
+    """
+    rpc = parse_rpc(xml)
+    assert rpc.rpc_type == "edit-config"
+    cli_lines, errors = convert_xml_to_cli(xml, "LWLT-C")
+    assert errors == []
+    assert any(
+        "onus onu SB-FTTH-template root classifiers classifier-entry eg0" in line
+        for line in cli_lines
+    )

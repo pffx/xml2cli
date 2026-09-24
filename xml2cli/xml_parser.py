@@ -57,6 +57,18 @@ def sanitize_netconf_xml(xml_content: str) -> str:
     return _NUMERIC_TAG_RE.sub(_replace_numeric_tag, sanitized)
 
 
+_RPC_OPERATIONS = frozenset(
+    {
+        "edit-config",
+        "get-config",
+        "get",
+        "commit",
+        "discard-changes",
+        "action",
+    }
+)
+
+
 def parse_rpc(xml_content: str) -> RpcDocument:
     sanitized = sanitize_netconf_xml(xml_content)
     try:
@@ -64,26 +76,22 @@ def parse_rpc(xml_content: str) -> RpcDocument:
     except ET.ParseError as exc:
         raise ValueError(f"XML parse error: {exc}") from exc
 
-    if local_name(root.tag) == "rpc-reply":
+    root_name = local_name(root.tag)
+    if root_name == "rpc-reply":
         raise ValueError("rpc-reply documents are not supported in v1")
 
-    if local_name(root.tag) != "rpc":
-        raise ValueError("Expected root element <rpc>")
+    # Accept bare <edit-config>/<action>/... without an outer <rpc> wrapper
+    # (common when pasting device payloads or config excerpts).
+    if root_name in _RPC_OPERATIONS:
+        return RpcDocument(root_name, root, root)
+
+    if root_name != "rpc":
+        raise ValueError("Expected root element <rpc> or an RPC operation such as <edit-config>")
 
     for child in root:
         name = local_name(child.tag)
-        if name == "edit-config":
-            return RpcDocument("edit-config", root, child)
-        if name == "get-config":
-            return RpcDocument("get-config", root, child)
-        if name == "get":
-            return RpcDocument("get", root, child)
-        if name == "commit":
-            return RpcDocument("commit", root, child)
-        if name == "discard-changes":
-            return RpcDocument("discard-changes", root, child)
-        if name == "action":
-            return RpcDocument("action", root, child)
+        if name in _RPC_OPERATIONS:
+            return RpcDocument(name, root, child)
 
     raise ValueError("Unsupported or missing RPC operation")
 
